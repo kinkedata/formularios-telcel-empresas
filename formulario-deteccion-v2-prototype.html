@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulario Telcel - Detección Inteligente</title>
+    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Source Sans 3', 'Source Sans Pro', Arial, sans-serif;
+            background: #F2F7F9;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 820px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .header h1 {
+            color: #00529B;
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            color: #595959;
+            font-size: 14px;
+        }
+
+        /* BANNER SUPERIOR DE PLANES */
+        .plans-banner {
+            background: linear-gradient(135deg, #FFF1F1 0%, #FFE8E8 100%);
+            border-left: 4px solid #D32222;
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 32px;
+            text-align: center;
+        }
+
+        .plans-banner h3 {
+            color: #00529B;
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .plans-banner p {
+            color: #595959;
+            font-size: 13px;
+            margin-bottom: 16px;
+            line-height: 1.5;
+        }
+
+        .plans-link {
+            display: inline-block;
+            background: #00529B;
+            color: white;
+            padding: 12px 32px;
+            border-radius: 24px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            transition: background 0.2s ease;
+            cursor: pointer;
+            border: none;
+        }
+
+        .plans-link:hover {
+            background: #004380;
+        }
+
+        .plans-footer {
+            color: #595959;
+            font-size: 12px;
+            margin-top: 16px;
+        }
+
+        /* FORMULARIO */
+        .form {
+            background: white;
+            border-radius: 12px;
+            padding: 32px;
+            box-shadow: 0 2px 8px rgba(0, 34, 77, 0.08);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 16px;
+        }
+
+        .form-row.single {
+            grid-template-columns: 1fr;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            color: #595959;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        input, select, textarea {
+            padding: 12px 16px;
+            border: 1px solid #BAC9D8;
+            border-radius: 8px;
+            font-family: 'Source Sans 3', Arial;
+            font-size: 14px;
+            color: #222222;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #0071D1;
+            box-shadow: 0 0 0 3px rgba(7, 113, 209, 0.1);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        /* NOTIFICACIÓN FLOTANTE DE DETECCIÓN */
+        .notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #E6F1FB;
+            border: 1px solid #0071D1;
+            border-radius: 8px;
+            padding: 16px;
+            max-width: 280px;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0, 113, 209, 0.2);
+            animation: slideIn 0.3s ease;
+            font-size: 13px;
+            color: #00529B;
+        }
+
+        .notification.hidden {
+            display: none;
+        }
+
+        .notification h4 {
+            margin: 0 0 8px 0;
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        .notification p {
+            margin: 6px 0;
+            font-size: 12px;
+        }
+
+        .notification .close {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: none;
+            border: none;
+            color: #0071D1;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(350px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* INDICADOR DE DETECCIÓN EN CAMPO */
+        .field-detected {
+            position: relative;
+        }
+
+        .field-detected::after {
+            content: '✓ Detectado';
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 12px;
+            color: #00A100;
+            font-weight: 600;
+            pointer-events: none;
+            display: none;
+        }
+
+        .field-detected.active::after {
+            display: block;
+        }
+
+        /* BOTÓN ENVIAR */
+        .submit-btn {
+            background: #00529B;
+            color: white;
+            border: none;
+            padding: 14px 40px;
+            border-radius: 32px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s ease;
+            width: 100%;
+            margin-top: 24px;
+        }
+
+        .submit-btn:hover {
+            background: #004380;
+        }
+
+        .submit-btn:active {
+            transform: translateY(1px);
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+
+            .notification {
+                max-width: calc(100% - 40px);
+                right: 20px;
+                left: 20px;
+            }
+
+            .form {
+                padding: 20px;
+            }
+        }
+
+        /* DEBUG INFO (Solo en desarrollo) */
+        .debug-info {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            color: #00FF00;
+            padding: 12px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 11px;
+            max-width: 200px;
+            display: none;
+            z-index: 999;
+        }
+
+        .debug-info.show {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Soluciones Telcel Empresas</h1>
+            <p>Detecta automáticamente qué necesitas mientras escribes</p>
+        </div>
+
+        <!-- BANNER SUPERIOR -->
+        <div class="plans-banner">
+            <h3>⚠️ ¿Buscas planes de renta mensual?</h3>
+            <p>Si necesitas Plan Telcel Empresa o Plan Telcel Ultra Empresa, accede directamente a nuestra página de planes:</p>
+            <button class="plans-link" onclick="alert('Redirigiendo a: https://mkt.telcelsoluciones.com/planes-telcel-empresa')">
+                → Ir a Planes Telcel Empresa
+            </button>
+            <p class="plans-footer">O completa el formulario a continuación para otras soluciones</p>
+        </div>
+
+        <!-- FORMULARIO -->
+        <form class="form" id="contactForm">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="nombre">*Nombre</label>
+                    <input type="text" id="nombre" name="nombre" required>
+                </div>
+                <div class="form-group">
+                    <label for="apellido">*Apellido</label>
+                    <input type="text" id="apellido" name="apellido" required>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="correo">*Correo empresarial</label>
+                    <input type="email" id="correo" name="correo" required>
+                </div>
+                <div class="form-group">
+                    <label for="telefono">*Teléfono de contacto</label>
+                    <input type="tel" id="telefono" name="telefono" pattern="[0-9]{10}" required>
+                </div>
+            </div>
+
+            <div class="form-row single">
+                <div class="form-group">
+                    <label for="solucion">*¿Cuál solución te interesa?</label>
+                    <select id="solucion" name="solucion" required>
+                        <option value="">Selecciona una solución</option>
+                        <option value="Planes Empresariales">Planes Empresariales</option>
+                        <option value="Conectividad Telcel">Conectividad Telcel</option>
+                        <option value="Seguridad">Seguridad</option>
+                        <option value="Servicios Cloud">Servicios Cloud</option>
+                        <option value="Business Intelligence">Business Intelligence</option>
+                        <option value="Mobile Marketing">Mobile Marketing</option>
+                        <option value="Comunicación Empresarial">Comunicación Empresarial</option>
+                        <option value="Gestión Vehicular Telcel">Gestión Vehicular Telcel</option>
+                        <option value="Gestión de Fuerza en Campo">Gestión de Fuerza en Campo</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-row single">
+                <div class="form-group">
+                    <label for="servicio">*Servicio de tu interés</label>
+                    <select id="servicio" name="servicio" required>
+                        <option value="">Selecciona primero una solución</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-row single">
+                <div class="form-group">
+                    <label for="mensaje">Mensaje <span style="color: #0071D1; font-size: 11px;">(escribe detalles y veremos si podemos ayudarte mejor)</span></label>
+                    <textarea id="mensaje" name="mensaje" placeholder="Describe tu necesidad. Ej: Necesito seguridad MDM para mis dispositivos..."></textarea>
+                </div>
+            </div>
+
+            <button type="submit" class="submit-btn">Enviar Solicitud</button>
+        </form>
+    </div>
+
+    <!-- NOTIFICACIÓN FLOTANTE -->
+    <div id="notification" class="notification hidden">
+        <button class="close" onclick="closeNotification()">✕</button>
+        <h4 id="notif-title">✓ Detectamos tu necesidad</h4>
+        <p id="notif-solution">Solución: <strong id="notif-sol-name"></strong></p>
+        <p id="notif-service">Servicio: <strong id="notif-serv-name"></strong></p>
+        <p style="font-size: 11px; margin-top: 8px; opacity: 0.8;">Puedes cambiar tu selección si lo deseas</p>
+    </div>
+
+    <!-- DEBUG (Presiona Ctrl+Shift+D para mostrar/ocultar) -->
+    <div id="debug" class="debug-info">
+        <div>Texto detectado: <span id="debug-text">-</span></div>
+        <div>Palabra clave: <span id="debug-keyword">-</span></div>
+        <div>Solución: <span id="debug-solution">-</span></div>
+    </div>
+
+    <script>
+        // ===== DICCIONARIO DE PALABRAS CLAVE =====
+        const keywordMap = {
+            // Planes
+            'plan': {
+                solución: 'Planes Empresariales',
+                servicio: 'Plan Telcel Empresa',
+                opciones: ['Plan Telcel Empresa', 'Plan Telcel Ultra Empresa']
+            },
+            'renta': {
+                solución: 'Planes Empresariales',
+                servicio: 'Plan Telcel Empresa',
+                opciones: ['Plan Telcel Empresa', 'Plan Telcel Ultra Empresa']
+            },
+            'línea': {
+                solución: 'Planes Empresariales',
+                servicio: 'Plan Telcel Empresa',
+                opciones: ['Plan Telcel Empresa', 'Plan Telcel Ultra Empresa']
+            },
+            'teléfono': {
+                solución: 'Planes Empresariales',
+                servicio: 'Plan Telcel Empresa',
+                opciones: ['Plan Telcel Empresa', 'Plan Telcel Ultra Empresa']
+            },
+            'chip': {
+                solución: 'Planes Empresariales',
+                servicio: 'Plan Telcel Empresa',
+                opciones: ['Plan Telcel Empresa', 'Plan Telcel Ultra Empresa']
+            },
+
+            // Seguridad
+            'seguridad': {
+                solución: 'Seguridad',
+                servicio: 'Control de Dispositivos MDM',
+                opciones: ['Control de Dispositivos MDM', 'Control Móvil Empresarial', 'Norton Antivirus Empresarial']
+            },
+            'mdm': {
+                solución: 'Seguridad',
+                servicio: 'Control de Dispositivos MDM',
+                opciones: ['Control de Dispositivos MDM']
+            },
+            'antivirus': {
+                solución: 'Seguridad',
+                servicio: 'Norton Antivirus Empresarial',
+                opciones: ['Norton Antivirus Empresarial']
+            },
+            'dispositivos': {
+                solución: 'Seguridad',
+                servicio: 'Control de Dispositivos MDM',
+                opciones: ['Control de Dispositivos MDM']
+            },
+
+            // Cloud
+            'cloud': {
+                solución: 'Servicios Cloud',
+                servicio: 'Microsoft 365',
+                opciones: ['Microsoft 365', 'Hosting y Desarrollo Web', 'Google Workspace']
+            },
+            'microsoft': {
+                solución: 'Servicios Cloud',
+                servicio: 'Microsoft 365',
+                opciones: ['Microsoft 365']
+            },
+            'google workspace': {
+                solución: 'Servicios Cloud',
+                servicio: 'Google Workspace',
+                opciones: ['Google Workspace']
+            },
+            'almacenamiento': {
+                solución: 'Servicios Cloud',
+                servicio: 'Claro Drive Negocio',
+                opciones: ['Claro Drive Negocio']
+            },
+
+            // Conectividad
+            'conectividad': {
+                solución: 'Conectividad Telcel',
+                servicio: 'eSIM',
+                opciones: ['eSIM', 'Conectividad Avanzada M2M']
+            },
+            'esim': {
+                solución: 'Conectividad Telcel',
+                servicio: 'eSIM',
+                opciones: ['eSIM']
+            },
+            'm2m': {
+                solución: 'Conectividad Telcel',
+                servicio: 'Conectividad Avanzada M2M',
+                opciones: ['Conectividad Avanzada M2M']
+            },
+
+            // Mobile Marketing
+            'marketing': {
+                solución: 'Mobile Marketing',
+                servicio: 'Mensajería Masiva Empresarial',
+                opciones: ['Mensajería Masiva Empresarial']
+            },
+            'sms': {
+                solución: 'Mobile Marketing',
+                servicio: 'Mensajería Masiva Empresarial',
+                opciones: ['Mensajería Masiva Empresarial']
+            },
+
+            // Gestión Vehicular
+            'vehículo': {
+                solución: 'Gestión Vehicular Telcel',
+                servicio: 'Telemetría',
+                opciones: ['Telemetría', 'Medición de Combustible']
+            },
+            'flota': {
+                solución: 'Gestión Vehicular Telcel',
+                servicio: 'Telemetría',
+                opciones: ['Telemetría']
+            },
+            'telemetría': {
+                solución: 'Gestión Vehicular Telcel',
+                servicio: 'Telemetría',
+                opciones: ['Telemetría']
+            },
+
+            // Gestión Fuerza Campo
+            'campo': {
+                solución: 'Gestión de Fuerza en Campo',
+                servicio: 'Promotoría y Merchandising',
+                opciones: ['Promotoría y Merchandising']
+            },
+            'vendedor': {
+                solución: 'Gestión de Fuerza en Campo',
+                servicio: 'Promotoría y Merchandising',
+                opciones: ['Promotoría y Merchandising']
+            },
+            'cobranza': {
+                solución: 'Gestión de Fuerza en Campo',
+                servicio: 'Cobranza',
+                opciones: ['Cobranza']
+            }
+        };
+
+        let lastDetectedKeyword = null;
+
+        // ===== INICIALIZACIÓN =====
+        document.addEventListener('DOMContentLoaded', function() {
+            const mensajeInput = document.getElementById('mensaje');
+            const solucionSelect = document.getElementById('solucion');
+            const servicioSelect = document.getElementById('servicio');
+
+            // Cargar servicios según solución (sin detección)
+            solucionSelect.addEventListener('change', loadServicios);
+
+            // Detección al escribir en mensaje
+            mensajeInput.addEventListener('input', function() {
+                detectarYActualizar(this.value);
+            });
+
+            // Debug con Ctrl+Shift+D
+            document.addEventListener('keydown', function(e) {
+                if (e.ctrlKey && e.shiftKey && e.code === 'KeyD') {
+                    document.getElementById('debug').classList.toggle('show');
+                }
+            });
+
+            // Envío del formulario
+            document.getElementById('contactForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                alert('Formulario enviado con:\n- Solución: ' + document.getElementById('solucion').value + 
+                      '\n- Servicio: ' + document.getElementById('servicio').value);
+            });
+
+            // Cargar servicios iniciales
+            loadServicios();
+        });
+
+        // ===== FUNCIONES =====
+        function loadServicios() {
+            const solucionSelect = document.getElementById('solucion');
+            const servicioSelect = document.getElementById('servicio');
+            const selectedSol = solucionSelect.value;
+
+            // Mapeo de soluciones a servicios (basado en el formulario original)
+            const serviciosMap = {
+                'Planes Empresariales': ['Plan Telcel Empresa', 'Plan Telcel Ultra Empresa'],
+                'Conectividad Telcel': ['eSIM', 'Conectividad Avanzada M2M', 'Redes Privadas de Datos'],
+                'Seguridad': ['Control de Dispositivos MDM', 'Control Móvil Empresarial', 'Norton Antivirus Empresarial', 'Lookout'],
+                'Servicios Cloud': ['Microsoft 365', 'Hosting y Desarrollo Web', 'Google Workspace', 'Claro Drive Negocio', 'VMware Workspace ONE'],
+                'Business Intelligence': ['GEODATA', 'Autenticación Móvil', 'Google Workspace', 'Indicadores móviles'],
+                'Mobile Marketing': ['Distribución de Aplicaciones', 'Datos Patrocinados', 'Recompensas', 'Mensajería Masiva Empresarial', 'Mensajes RCS'],
+                'Comunicación Empresarial': ['Control de Ventas', 'Formularios Verum', 'SekurMessenger', 'Push to Talk'],
+                'Gestión Vehicular Telcel': ['Medición de Combustible', 'Cadena de Frío', 'Telemetría', 'Modulo de Ruteo', 'Hábitos de Conducción', 'Video a bordo'],
+                'Gestión de Fuerza en Campo': ['Promotoría y Merchandising', 'Control de Sucursales', 'Servicios en Campo', 'Cobranza', 'Localización Empresarial Telcel', 'Logística']
+            };
+
+            const servicios = serviciosMap[selectedSol] || [];
+            servicioSelect.innerHTML = '<option value="">Selecciona un servicio</option>';
+            servicios.forEach(servicio => {
+                const option = document.createElement('option');
+                option.value = servicio;
+                option.textContent = servicio;
+                servicioSelect.appendChild(option);
+            });
+        }
+
+        function detectarYActualizar(texto) {
+            const textoLower = texto.toLowerCase().trim();
+
+            if (textoLower.length < 2) {
+                updateDebug(textoLower, '', '');
+                return;
+            }
+
+            let coincidencia = null;
+
+            // Buscar coincidencias (frases primero, luego palabras)
+            Object.keys(keywordMap).forEach(keyword => {
+                if (textoLower.includes(keyword)) {
+                    if (!coincidencia || keyword.length > coincidencia.length) {
+                        coincidencia = keyword;
+                    }
+                }
+            });
+
+            if (coincidencia && coincidencia !== lastDetectedKeyword) {
+                lastDetectedKeyword = coincidencia;
+                const config = keywordMap[coincidencia];
+                actualizarFormulario(config, coincidencia);
+                updateDebug(textoLower, coincidencia, config.solución);
+            } else if (!coincidencia) {
+                lastDetectedKeyword = null;
+                updateDebug(textoLower, '', '');
+            }
+        }
+
+        function actualizarFormulario(config, keyword) {
+            const solucionSelect = document.getElementById('solucion');
+            const servicioSelect = document.getElementById('servicio');
+
+            // Actualizar solución
+            solucionSelect.value = config.solución;
+            solucionSelect.dispatchEvent(new Event('change', { bubbles: true }));
+
+            // Pequeño delay para que carguen los servicios
+            setTimeout(() => {
+                servicioSelect.value = config.servicio;
+                mostrarNotificacion(config.solución, config.servicio);
+            }, 100);
+        }
+
+        function mostrarNotificacion(solucion, servicio) {
+            const notif = document.getElementById('notification');
+            document.getElementById('notif-sol-name').textContent = solucion;
+            document.getElementById('notif-serv-name').textContent = servicio;
+            notif.classList.remove('hidden');
+
+            // Auto-cerrar después de 6 segundos
+            setTimeout(() => {
+                if (!notif.classList.contains('hidden')) {
+                    notif.classList.add('hidden');
+                }
+            }, 6000);
+        }
+
+        function closeNotification() {
+            document.getElementById('notification').classList.add('hidden');
+        }
+
+        function updateDebug(texto, keyword, solucion) {
+            document.getElementById('debug-text').textContent = texto.substring(0, 30) + (texto.length > 30 ? '...' : '');
+            document.getElementById('debug-keyword').textContent = keyword || '-';
+            document.getElementById('debug-solution').textContent = solucion || '-';
+        }
+    </script>
+</body>
+</html>
