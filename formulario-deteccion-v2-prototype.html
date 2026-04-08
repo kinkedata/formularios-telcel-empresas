@@ -135,9 +135,49 @@
             box-shadow: 0 0 0 3px rgba(7, 113, 209, 0.1);
         }
 
+        select:disabled {
+            background: #F8F8F8;
+            border-color: #D0D0D0;
+            color: #757575;
+            cursor: not-allowed;
+        }
+
         textarea {
             resize: vertical;
             min-height: 100px;
+        }
+
+        /* CHECKBOXES */
+        .checkbox-group {
+            margin: 24px 0 8px;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .checkbox {
+            width: 18px;
+            height: 18px;
+            margin-top: 2px;
+            accent-color: #0071D1;
+            flex-shrink: 0;
+        }
+
+        .checkbox-label {
+            font-size: 14px;
+            color: #222222;
+            line-height: 1.4;
+            font-weight: 400;
+        }
+
+        .checkbox-label a {
+            color: #0071D1;
+            font-weight: 600;
+            text-decoration: underline;
         }
 
         /* NOTIFICACIÓN FLOTANTE DE DETECCIÓN */
@@ -228,7 +268,9 @@
             cursor: pointer;
             transition: background 0.2s ease;
             width: 100%;
-            margin-top: 24px;
+            max-width: 260px;
+            display: block;
+            margin: 16px auto 0;
         }
 
         .submit-btn:hover {
@@ -297,63 +339,197 @@
 
         <!-- FORMULARIO -->
         <form class="form" id="contactForm">
+            <input type="hidden" name="Submitted" value="true">
+            <input type="hidden" id="Region" name="Region" value="">
+            <input type="hidden" id="EstadoNombreInput" name="EstadoNombreInput" value="">
+            <input type="hidden" id="solHidden" name="SolucionInteres" value="">
+
+            <!-- Nombre / Apellido -->
             <div class="form-row">
                 <div class="form-group">
-                    <label for="nombre">*Nombre</label>
-                    <input type="text" id="nombre" name="nombre" required>
+                    <label for="Nombre">*Nombre</label>
+                    <input type="text" id="Nombre" name="Nombre" required
+                        pattern="[A-Za-zÁÉÍÓÚÜÑáéíóúüñ\s]{2,50}">
                 </div>
                 <div class="form-group">
-                    <label for="apellido">*Apellido</label>
-                    <input type="text" id="apellido" name="apellido" required>
+                    <label for="Apellido">*Apellido</label>
+                    <input type="text" id="Apellido" name="Apellido" required
+                        pattern="[A-Za-zÁÉÍÓÚÜÑáéíóúüñ\s]{2,50}">
                 </div>
             </div>
 
+            <!-- Correo / Teléfono -->
             <div class="form-row">
                 <div class="form-group">
-                    <label for="correo">*Correo empresarial</label>
-                    <input type="email" id="correo" name="correo" required>
+                    <label for="Correo">*Correo empresarial</label>
+                    <input type="email" id="Correo" name="Correo" required
+                        pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$">
                 </div>
                 <div class="form-group">
-                    <label for="telefono">*Teléfono de contacto</label>
-                    <input type="tel" id="telefono" name="telefono" pattern="[0-9]{10}" required>
+                    <label for="Telefono">*Teléfono de contacto</label>
+                    <input type="text" id="Telefono" name="Telefono" required
+                        inputmode="numeric" pattern="[0-9]{10}">
                 </div>
             </div>
 
+            <!-- Estado -->
             <div class="form-row single">
                 <div class="form-group">
-                    <label for="solucion">*¿Cuál solución te interesa?</label>
-                    <select id="solucion" name="solucion" required>
-                        <option value="">Selecciona una solución</option>
-                        <option value="Planes Empresariales">Planes Empresariales</option>
-                        <option value="Conectividad Telcel">Conectividad Telcel</option>
-                        <option value="Seguridad">Seguridad</option>
-                        <option value="Servicios Cloud">Servicios Cloud</option>
-                        <option value="Business Intelligence">Business Intelligence</option>
-                        <option value="Mobile Marketing">Mobile Marketing</option>
-                        <option value="Comunicación Empresarial">Comunicación Empresarial</option>
-                        <option value="Gestión Vehicular Telcel">Gestión Vehicular Telcel</option>
-                        <option value="Gestión de Fuerza en Campo">Gestión de Fuerza en Campo</option>
+                    <label for="Estado">*Estado</label>
+                    <select id="Estado" name="Estado" required>
+                        <option value="">Selecciona un Estado</option>
+                        <option value="AGU">Aguascalientes</option>
+                        <option value="BCN">Baja California</option>
+                        <option value="BCS">Baja California Sur</option>
+                        <option value="CAM">Campeche</option>
+                        <option value="CHP">Chiapas</option>
+                        <option value="CHH">Chihuahua</option>
+                        <option value="CMX">Ciudad de México</option>
+                        <option value="COA">Coahuila</option>
+                        <option value="COL">Colima</option>
+                        <option value="DUR">Durango</option>
+                        <option value="GUA">Guanajuato</option>
+                        <option value="GRO">Guerrero</option>
+                        <option value="HID">Hidalgo</option>
+                        <option value="JAL">Jalisco</option>
+                        <option value="MEX">Estado de México</option>
+                        <option value="MIC">Michoacán</option>
+                        <option value="MOR">Morelos</option>
+                        <option value="NAY">Nayarit</option>
+                        <option value="NLE">Nuevo León</option>
+                        <option value="OAX">Oaxaca</option>
+                        <option value="PUE">Puebla</option>
+                        <option value="QUE">Querétaro</option>
+                        <option value="ROO">Quintana Roo</option>
+                        <option value="SLP">San Luis Potosí</option>
+                        <option value="SIN">Sinaloa</option>
+                        <option value="SON">Sonora</option>
+                        <option value="TAB">Tabasco</option>
+                        <option value="TAM">Tamaulipas</option>
+                        <option value="TLA">Tlaxcala</option>
+                        <option value="VER">Veracruz</option>
+                        <option value="YUC">Yucatán</option>
+                        <option value="ZAC">Zacatecas</option>
                     </select>
                 </div>
             </div>
 
+            <!-- Municipio -->
             <div class="form-row single">
                 <div class="form-group">
-                    <label for="servicio">*Servicio de tu interés</label>
-                    <select id="servicio" name="servicio" required>
-                        <option value="">Selecciona primero una solución</option>
+                    <label for="Municipio">*Municipio</label>
+                    <select id="Municipio" name="Municipio" required disabled>
+                        <option value="">Selecciona un municipio</option>
                     </select>
                 </div>
             </div>
 
+            <!-- Razón Social -->
             <div class="form-row single">
                 <div class="form-group">
-                    <label for="mensaje">Mensaje <span style="color: #0071D1; font-size: 11px;">(escribe detalles y veremos si podemos ayudarte mejor)</span></label>
-                    <textarea id="mensaje" name="mensaje" placeholder="Describe tu necesidad. Ej: Necesito seguridad MDM para mis dispositivos..."></textarea>
+                    <label for="RazonSocial">*Razón Social</label>
+                    <input type="text" id="RazonSocial" name="RazonSocial" required>
                 </div>
             </div>
 
-            <button type="submit" class="submit-btn">Enviar Solicitud</button>
+            <!-- Cargo -->
+            <div class="form-row single">
+                <div class="form-group">
+                    <label for="Cargo">*¿Cuál es tu cargo?</label>
+                    <select id="Cargo" name="Cargo" required>
+                        <option value="">Selecciona un cargo</option>
+                        <option value="Gerente">Gerente</option>
+                        <option value="Director">Director</option>
+                        <option value="Asistente">Asistente</option>
+                        <option value="Dueño/Propietario">Dueño/Propietario</option>
+                        <option value="Contador">Contador</option>
+                        <option value="Jefe">Jefe</option>
+                        <option value="Analista">Analista</option>
+                        <option value="Especialista">Especialista</option>
+                        <option value="CEO/COO">CEO/COO</option>
+                        <option value="Alcalde/Secretario">Alcalde/Secretario</option>
+                        <option value="Otro">Otro</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Otro Cargo (condicional) -->
+            <div class="form-row single" id="other-cargo-row" style="display:none; margin-bottom: 0;">
+                <div class="form-group">
+                    <label for="OtroCargo">Especifique otro cargo</label>
+                    <input type="text" id="OtroCargo" name="OtroCargo">
+                </div>
+            </div>
+
+            <!-- Número de empleados -->
+            <div class="form-row single">
+                <div class="form-group">
+                    <label for="NoEmpleados">*Número de empleados</label>
+                    <select id="NoEmpleados" name="NoEmpleados" required>
+                        <option value="">Selecciona el número de empleados</option>
+                        <option value="1 a 5">1 a 5</option>
+                        <option value="5 a 25">5 a 25</option>
+                        <option value="25 a 50">25 a 50</option>
+                        <option value="50 a 100">50 a 100</option>
+                        <option value="100 a 500">100 a 500</option>
+                        <option value="500 a 1000">500 a 1000</option>
+                        <option value="1000+">1000+</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Solución -->
+            <div class="form-row single">
+                <div class="form-group">
+                    <label for="SolucionSelect">*¿Qué solución te interesa?</label>
+                    <select id="SolucionSelect" name="SolucionSelect" required>
+                        <option value="">Selecciona</option>
+                        <option value="COV">Conectividad Telcel</option>
+                        <option value="COE">Comunicación Empresarial</option>
+                        <option value="SEG">Seguridad</option>
+                        <option value="SEC">Servicios Cloud</option>
+                        <option value="BUI">Business Intelligence</option>
+                        <option value="MOM">Mobile Marketing</option>
+                        <option value="GVT">Gestión Vehicular Telcel</option>
+                        <option value="GFC">Gestión de Fuerza en Campo</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Servicio -->
+            <div class="form-row single">
+                <div class="form-group">
+                    <label for="ServicioInteres">*Servicio de tu interés <span style="color: #0071D1; font-size: 11px;">(escribe en el mensaje y te sugerimos uno)</span></label>
+                    <select id="ServicioInteres" name="ServicioInteres" required disabled>
+                        <option value="">Selecciona el servicio de tu interés</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Mensaje -->
+            <div class="form-row single">
+                <div class="form-group">
+                    <label for="Mensaje">Mensaje *</label>
+                    <textarea id="Mensaje" name="Mensaje" required
+                        placeholder="Describe tu necesidad. Ej: Necesito seguridad MDM para mis dispositivos..."></textarea>
+                </div>
+            </div>
+
+            <!-- Checkboxes -->
+            <div class="checkbox-group">
+                <div class="checkbox-item">
+                    <input class="checkbox" type="checkbox" id="AvisoPrivacidad" name="AvisoPrivacidad" required>
+                    <label class="checkbox-label" for="AvisoPrivacidad">
+                        He leído y acepto el <a href="https://www.telcel.com/aviso-de-privacidad" target="_blank">Aviso de Privacidad</a>
+                    </label>
+                </div>
+                <div class="checkbox-item">
+                    <input class="checkbox" type="checkbox" id="Newsletter" name="Newsletter">
+                    <label class="checkbox-label" for="Newsletter">Deseo recibir el Newsletter de Telcel Empresas</label>
+                </div>
+            </div>
+
+            <button type="submit" class="submit-btn">Enviar</button>
         </form>
     </div>
 
@@ -374,248 +550,459 @@
     </div>
 
     <script>
-        // ===== DICCIONARIO DE PALABRAS CLAVE =====
-        const keywordMap = {
-            // Planes
-            'plan': {
-                solución: 'Planes Empresariales',
-                servicio: 'Plan Telcel Empresa',
-                opciones: ['Plan Telcel Empresa', 'Plan Telcel Ultra Empresa']
-            },
-            'renta': {
-                solución: 'Planes Empresariales',
-                servicio: 'Plan Telcel Empresa',
-                opciones: ['Plan Telcel Empresa', 'Plan Telcel Ultra Empresa']
-            },
-            'línea': {
-                solución: 'Planes Empresariales',
-                servicio: 'Plan Telcel Empresa',
-                opciones: ['Plan Telcel Empresa', 'Plan Telcel Ultra Empresa']
-            },
-            'teléfono': {
-                solución: 'Planes Empresariales',
-                servicio: 'Plan Telcel Empresa',
-                opciones: ['Plan Telcel Empresa', 'Plan Telcel Ultra Empresa']
-            },
-            'chip': {
-                solución: 'Planes Empresariales',
-                servicio: 'Plan Telcel Empresa',
-                opciones: ['Plan Telcel Empresa', 'Plan Telcel Ultra Empresa']
-            },
-
-            // Seguridad
-            'seguridad': {
-                solución: 'Seguridad',
-                servicio: 'Control de Dispositivos MDM',
-                opciones: ['Control de Dispositivos MDM', 'Control Móvil Empresarial', 'Norton Antivirus Empresarial']
-            },
-            'mdm': {
-                solución: 'Seguridad',
-                servicio: 'Control de Dispositivos MDM',
-                opciones: ['Control de Dispositivos MDM']
-            },
-            'antivirus': {
-                solución: 'Seguridad',
-                servicio: 'Norton Antivirus Empresarial',
-                opciones: ['Norton Antivirus Empresarial']
-            },
-            'dispositivos': {
-                solución: 'Seguridad',
-                servicio: 'Control de Dispositivos MDM',
-                opciones: ['Control de Dispositivos MDM']
-            },
-
-            // Cloud
-            'cloud': {
-                solución: 'Servicios Cloud',
-                servicio: 'Microsoft 365',
-                opciones: ['Microsoft 365', 'Hosting y Desarrollo Web', 'Google Workspace']
-            },
-            'microsoft': {
-                solución: 'Servicios Cloud',
-                servicio: 'Microsoft 365',
-                opciones: ['Microsoft 365']
-            },
-            'google workspace': {
-                solución: 'Servicios Cloud',
-                servicio: 'Google Workspace',
-                opciones: ['Google Workspace']
-            },
-            'almacenamiento': {
-                solución: 'Servicios Cloud',
-                servicio: 'Claro Drive Negocio',
-                opciones: ['Claro Drive Negocio']
-            },
-
-            // Conectividad
-            'conectividad': {
-                solución: 'Conectividad Telcel',
-                servicio: 'eSIM',
-                opciones: ['eSIM', 'Conectividad Avanzada M2M']
-            },
-            'esim': {
-                solución: 'Conectividad Telcel',
-                servicio: 'eSIM',
-                opciones: ['eSIM']
-            },
-            'm2m': {
-                solución: 'Conectividad Telcel',
-                servicio: 'Conectividad Avanzada M2M',
-                opciones: ['Conectividad Avanzada M2M']
-            },
-
-            // Mobile Marketing
-            'marketing': {
-                solución: 'Mobile Marketing',
-                servicio: 'Mensajería Masiva Empresarial',
-                opciones: ['Mensajería Masiva Empresarial']
-            },
-            'sms': {
-                solución: 'Mobile Marketing',
-                servicio: 'Mensajería Masiva Empresarial',
-                opciones: ['Mensajería Masiva Empresarial']
-            },
-
-            // Gestión Vehicular
-            'vehículo': {
-                solución: 'Gestión Vehicular Telcel',
-                servicio: 'Telemetría',
-                opciones: ['Telemetría', 'Medición de Combustible']
-            },
-            'flota': {
-                solución: 'Gestión Vehicular Telcel',
-                servicio: 'Telemetría',
-                opciones: ['Telemetría']
-            },
-            'telemetría': {
-                solución: 'Gestión Vehicular Telcel',
-                servicio: 'Telemetría',
-                opciones: ['Telemetría']
-            },
-
-            // Gestión Fuerza Campo
-            'campo': {
-                solución: 'Gestión de Fuerza en Campo',
-                servicio: 'Promotoría y Merchandising',
-                opciones: ['Promotoría y Merchandising']
-            },
-            'vendedor': {
-                solución: 'Gestión de Fuerza en Campo',
-                servicio: 'Promotoría y Merchandising',
-                opciones: ['Promotoría y Merchandising']
-            },
-            'cobranza': {
-                solución: 'Gestión de Fuerza en Campo',
-                servicio: 'Cobranza',
-                opciones: ['Cobranza']
-            }
+        // ===== DATOS DE MUNICIPIOS (prototipo estático) =====
+        const municipiosPorEstado = {
+            AGU: ['Aguascalientes','Asientos','Calvillo','Cosío','El Llano','Jesús María','Pabellón de Arteaga','Rincón de Romos','San Francisco de los Romo','Tepezalá'],
+            BCN: ['Ensenada','Mexicali','Playas de Rosarito','Tecate','Tijuana'],
+            BCS: ['Comondú','La Paz','Loreto','Los Cabos','Mulegé'],
+            CAM: ['Calkiní','Campeche','Carmen','Champotón','Escárcega','Hecelchakán','Hopelchén','Palizada','Tenabo'],
+            CHP: ['Comitán de Domínguez','Ocosingo','San Cristóbal de las Casas','Tapachula','Tonalá','Tuxtla Gutiérrez'],
+            CHH: ['Camargo','Chihuahua','Ciudad Juárez','Cuauhtémoc','Delicias','Hidalgo del Parral','Nuevo Casas Grandes'],
+            CMX: ['Álvaro Obregón','Azcapotzalco','Benito Juárez','Coyoacán','Cuajimalpa de Morelos','Cuauhtémoc','Gustavo A. Madero','Iztacalco','Iztapalapa','La Magdalena Contreras','Miguel Hidalgo','Milpa Alta','Tláhuac','Tlalpan','Venustiano Carranza','Xochimilco'],
+            COA: ['Monclova','Piedras Negras','Saltillo','San Pedro','Torreón'],
+            COL: ['Colima','Comala','Coquimatlán','Cuauhtémoc','Manzanillo','Minatitlán','Tecomán','Villa de Álvarez'],
+            DUR: ['Durango','Gómez Palacio','Lerdo','Santiago Papasquiaro','Vicente Guerrero'],
+            GUA: ['Celaya','Guanajuato','Irapuato','León','Salamanca','San Miguel de Allende','Silao de la Victoria'],
+            GRO: ['Acapulco de Juárez','Chilpancingo de los Bravo','Iguala de la Independencia','Taxco de Alarcón','Zihuatanejo de Azueta'],
+            HID: ['Pachuca de Soto','Tizayuca','Tula de Allende','Tulancingo de Bravo'],
+            JAL: ['Guadalajara','Lagos de Moreno','Puerto Vallarta','Tlaquepaque','Tlajomulco de Zúñiga','Tonalá','Zapopan','Zapotlanejo'],
+            MEX: ['Ecatepec de Morelos','Ixtapaluca','Naucalpan de Juárez','Nezahualcóyotl','Texcoco','Tlalnepantla de Baz','Toluca','Tultitlán'],
+            MIC: ['Lázaro Cárdenas','Morelia','Uruapan','Zamora'],
+            MOR: ['Cuernavaca','Cuautla','Jiutepec','Temixco','Yautepec de Zaragoza'],
+            NAY: ['Acaponeta','Bahía de Banderas','Compostela','Tepic','Xalisco'],
+            NLE: ['Apodaca','Escobedo','García','Guadalupe','Juárez','Monterrey','San Nicolás de los Garza','San Pedro Garza García','Santa Catarina'],
+            OAX: ['Huatulco','Juchitán de Zaragoza','Oaxaca de Juárez','Salina Cruz','Tuxtepec'],
+            PUE: ['Atlixco','Cholula','Puebla','San Martín Texmelucan','Tehuacán','Teziutlán'],
+            QUE: ['El Marqués','Querétaro','San Juan del Río'],
+            ROO: ['Benito Juárez (Cancún)','Cozumel','Felipe Carrillo Puerto','Isla Mujeres','Othón P. Blanco (Chetumal)','Playa del Carmen','Solidaridad','Tulum'],
+            SLP: ['Ciudad Valles','Matehuala','San Luis Potosí','Soledad de Graciano Sánchez'],
+            SIN: ['Ahome','Culiacán','Guasave','Mazatlán','Navolato'],
+            SON: ['Cajeme (Ciudad Obregón)','Hermosillo','Nogales','San Luis Río Colorado'],
+            TAB: ['Cárdenas','Centro (Villahermosa)','Comalcalco','Huimanguillo','Macuspana','Paraíso'],
+            TAM: ['Altamira','Ciudad Madero','Matamoros','Nuevo Laredo','Reynosa','Tampico','Victoria'],
+            TLA: ['Apizaco','Huamantla','Tlaxcala'],
+            VER: ['Boca del Río','Coatzacoalcos','Córdoba','Minatitlán','Orizaba','Poza Rica de Hidalgo','Tuxpan','Veracruz','Xalapa'],
+            YUC: ['Kanasín','Mérida','Progreso','Umán','Valladolid'],
+            ZAC: ['Fresnillo','Guadalupe','Zacatecas']
         };
 
-        let lastDetectedKeyword = null;
+        // ===== MAPA DE PALABRAS CLAVE CON PESOS =====
+        // w: 3 = término muy específico, 2 = específico, 1 = general
+        // Las keywords ya están normalizadas (sin acentos, minúsculas)
+        const pesoMap = [
+            // --- SEG: Seguridad ---
+            { kw: 'mdm',                       sol: 'SEG', srv: 'Control de Dispositivos MDM',     w: 3 },
+            { kw: 'control de dispositivos',    sol: 'SEG', srv: 'Control de Dispositivos MDM',     w: 3 },
+            { kw: 'borrar remotamente',         sol: 'SEG', srv: 'Control de Dispositivos MDM',     w: 3 },
+            { kw: 'bloquear dispositivo',       sol: 'SEG', srv: 'Control de Dispositivos MDM',     w: 3 },
+            { kw: 'bloquear celular',           sol: 'SEG', srv: 'Control de Dispositivos MDM',     w: 3 },
+            { kw: 'robo de dispositivo',        sol: 'SEG', srv: 'Control de Dispositivos MDM',     w: 3 },
+            { kw: 'extravio de dispositivo',    sol: 'SEG', srv: 'Control de Dispositivos MDM',     w: 3 },
+            { kw: 'perdida de dispositivo',     sol: 'SEG', srv: 'Control de Dispositivos MDM',     w: 3 },
+            { kw: 'perdida de informacion',     sol: 'SEG', srv: 'Control de Dispositivos MDM',     w: 2 },
+            { kw: 'politicas de seguridad',     sol: 'SEG', srv: 'Control de Dispositivos MDM',     w: 2 },
+            { kw: 'cifrado',                    sol: 'SEG', srv: 'Control de Dispositivos MDM',     w: 2 },
+            { kw: 'control movil',              sol: 'SEG', srv: 'Control Móvil Empresarial',       w: 3 },
+            { kw: 'celulares empresa',          sol: 'SEG', srv: 'Control Móvil Empresarial',       w: 2 },
+            { kw: 'norton',                     sol: 'SEG', srv: 'Norton Antivirus Empresarial',    w: 3 },
+            { kw: 'antivirus',                  sol: 'SEG', srv: 'Norton Antivirus Empresarial',    w: 3 },
+            { kw: 'malware',                    sol: 'SEG', srv: 'Norton Antivirus Empresarial',    w: 3 },
+            { kw: 'phishing',                   sol: 'SEG', srv: 'Norton Antivirus Empresarial',    w: 3 },
+            { kw: 'ciberataque',                sol: 'SEG', srv: 'Norton Antivirus Empresarial',    w: 3 },
+            { kw: 'virus',                      sol: 'SEG', srv: 'Norton Antivirus Empresarial',    w: 2 },
+            { kw: 'amenaza digital',            sol: 'SEG', srv: 'Norton Antivirus Empresarial',    w: 2 },
+            { kw: 'brecha de seguridad',        sol: 'SEG', srv: 'Norton Antivirus Empresarial',    w: 2 },
+            { kw: 'lookout',                    sol: 'SEG', srv: 'Lookout',                         w: 3 },
+            { kw: 'proteccion movil',           sol: 'SEG', srv: 'Lookout',                         w: 2 },
+            { kw: 'vmware',                     sol: 'SEG', srv: 'VMware Workspace ONE',            w: 3 },
+            { kw: 'workspace one',              sol: 'SEG', srv: 'VMware Workspace ONE',            w: 3 },
+            { kw: 'seguridad movil',            sol: 'SEG', srv: 'Control de Dispositivos MDM',     w: 2 },
+
+            // --- GFC: Gestión de Fuerza en Campo ---
+            { kw: 'localizacion empresarial',   sol: 'GFC', srv: 'Localización Empresarial',        w: 3 },
+            { kw: 'localizacion',               sol: 'GFC', srv: 'Localización Empresarial',        w: 2 },
+            { kw: 'geocercas',                  sol: 'GFC', srv: 'Localización Empresarial',        w: 3 },
+            { kw: 'ubicacion de empleados',     sol: 'GFC', srv: 'Localización Empresarial',        w: 3 },
+            { kw: 'rastrear empleados',         sol: 'GFC', srv: 'Localización Empresarial',        w: 3 },
+            { kw: 'cobranza',                   sol: 'GFC', srv: 'Cobranza',                        w: 3 },
+            { kw: 'cartera vencida',            sol: 'GFC', srv: 'Cobranza',                        w: 3 },
+            { kw: 'cobros',                     sol: 'GFC', srv: 'Cobranza',                        w: 2 },
+            { kw: 'deudores',                   sol: 'GFC', srv: 'Cobranza',                        w: 2 },
+            { kw: 'promotoria',                 sol: 'GFC', srv: 'Promotoría y Merchandising',      w: 3 },
+            { kw: 'promotores',                 sol: 'GFC', srv: 'Promotoría y Merchandising',      w: 3 },
+            { kw: 'merchandising',              sol: 'GFC', srv: 'Promotoría y Merchandising',      w: 3 },
+            { kw: 'personal en campo',          sol: 'GFC', srv: 'Promotoría y Merchandising',      w: 3 },
+            { kw: 'fuerza de ventas',           sol: 'GFC', srv: 'Promotoría y Merchandising',      w: 2 },
+            { kw: 'vendedores en campo',        sol: 'GFC', srv: 'Promotoría y Merchandising',      w: 3 },
+            { kw: 'servicios en campo',         sol: 'GFC', srv: 'Servicios en Campo',              w: 3 },
+            { kw: 'tecnicos en campo',          sol: 'GFC', srv: 'Servicios en Campo',              w: 3 },
+            { kw: 'visitas de campo',           sol: 'GFC', srv: 'Servicios en Campo',              w: 3 },
+            { kw: 'sucursales',                 sol: 'GFC', srv: 'Control de Sucursales',           w: 3 },
+            { kw: 'rondines',                   sol: 'GFC', srv: 'Control de Sucursales',           w: 3 },
+            { kw: 'puntos de venta',            sol: 'GFC', srv: 'Control de Sucursales',           w: 2 },
+            { kw: 'logistica',                  sol: 'GFC', srv: 'Logística',                       w: 3 },
+            { kw: 'distribucion',               sol: 'GFC', srv: 'Logística',                       w: 2 },
+            { kw: 'entregas',                   sol: 'GFC', srv: 'Logística',                       w: 2 },
+            { kw: 'repartidores',               sol: 'GFC', srv: 'Logística',                       w: 3 },
+            { kw: 'rutas de entrega',           sol: 'GFC', srv: 'Logística',                       w: 3 },
+            { kw: 'gps',                        sol: 'GFC', srv: 'Localización Empresarial',        w: 2 },
+
+            // --- SEC: Servicios Cloud ---
+            { kw: 'microsoft 365',              sol: 'SEC', srv: 'Microsoft 365',                  w: 3 },
+            { kw: 'office 365',                 sol: 'SEC', srv: 'Microsoft 365',                  w: 3 },
+            { kw: 'microsoft',                  sol: 'SEC', srv: 'Microsoft 365',                  w: 2 },
+            { kw: 'teams',                      sol: 'SEC', srv: 'Microsoft 365',                  w: 3 },
+            { kw: 'outlook',                    sol: 'SEC', srv: 'Microsoft 365',                  w: 3 },
+            { kw: 'word',                       sol: 'SEC', srv: 'Microsoft 365',                  w: 2 },
+            { kw: 'excel',                      sol: 'SEC', srv: 'Microsoft 365',                  w: 2 },
+            { kw: 'powerpoint',                 sol: 'SEC', srv: 'Microsoft 365',                  w: 2 },
+            { kw: 'licencias office',           sol: 'SEC', srv: 'Microsoft 365',                  w: 3 },
+            { kw: 'hosting',                    sol: 'SEC', srv: 'Hosting y Desarrollo Web',       w: 3 },
+            { kw: 'pagina web',                 sol: 'SEC', srv: 'Hosting y Desarrollo Web',       w: 3 },
+            { kw: 'sitio web',                  sol: 'SEC', srv: 'Hosting y Desarrollo Web',       w: 3 },
+            { kw: 'dominio',                    sol: 'SEC', srv: 'Hosting y Desarrollo Web',       w: 2 },
+            { kw: 'desarrollo web',             sol: 'SEC', srv: 'Hosting y Desarrollo Web',       w: 3 },
+            { kw: 'claro drive',                sol: 'SEC', srv: 'Claro Drive Negocio',            w: 3 },
+            { kw: 'almacenamiento en nube',     sol: 'SEC', srv: 'Claro Drive Negocio',            w: 2 },
+            { kw: 'backup',                     sol: 'SEC', srv: 'Claro Drive Negocio',            w: 2 },
+            { kw: 'respaldo de archivos',       sol: 'SEC', srv: 'Claro Drive Negocio',            w: 2 },
+            { kw: 'sincronizacion',             sol: 'SEC', srv: 'Claro Drive Negocio',            w: 2 },
+            { kw: 'google workspace',           sol: 'SEC', srv: 'Google Workspace',               w: 3 },
+            { kw: 'gmail empresarial',          sol: 'SEC', srv: 'Google Workspace',               w: 3 },
+            { kw: 'google docs',                sol: 'SEC', srv: 'Google Workspace',               w: 3 },
+            { kw: 'nube',                       sol: 'SEC', srv: 'Claro Drive Negocio',            w: 1 },
+            { kw: 'licencias',                  sol: 'SEC', srv: 'Microsoft 365',                  w: 1 },
+            { kw: 'almacenamiento',             sol: 'SEC', srv: 'Claro Drive Negocio',            w: 1 },
+
+            // --- BUI: Business Intelligence ---
+            { kw: 'geodata',                    sol: 'BUI', srv: 'Geodata',                        w: 3 },
+            { kw: 'audiencias',                 sol: 'BUI', srv: 'Geodata',                        w: 3 },
+            { kw: 'patrones geograficos',       sol: 'BUI', srv: 'Geodata',                        w: 3 },
+            { kw: 'movilidad',                  sol: 'BUI', srv: 'Geodata',                        w: 2 },
+            { kw: 'analisis de datos',          sol: 'BUI', srv: 'Geodata',                        w: 2 },
+            { kw: 'insights',                   sol: 'BUI', srv: 'Geodata',                        w: 2 },
+            { kw: 'segmentacion de clientes',   sol: 'BUI', srv: 'Geodata',                        w: 3 },
+            { kw: 'inteligencia de negocios',   sol: 'BUI', srv: 'Geodata',                        w: 3 },
+            { kw: 'analitica',                  sol: 'BUI', srv: 'Geodata',                        w: 2 },
+            { kw: 'autenticacion movil',        sol: 'BUI', srv: 'Autenticación Móvil',            w: 3 },
+            { kw: 'verificacion de identidad',  sol: 'BUI', srv: 'Autenticación Móvil',            w: 3 },
+            { kw: 'validacion de identidad',    sol: 'BUI', srv: 'Autenticación Móvil',            w: 3 },
+            { kw: 'kyc',                        sol: 'BUI', srv: 'Autenticación Móvil',            w: 3 },
+            { kw: 'fraude',                     sol: 'BUI', srv: 'Autenticación Móvil',            w: 2 },
+            { kw: 'onboarding digital',         sol: 'BUI', srv: 'Autenticación Móvil',            w: 3 },
+            { kw: 'indicadores moviles',        sol: 'BUI', srv: 'Indicadores Móviles',            w: 3 },
+            { kw: 'indicadores',                sol: 'BUI', srv: 'Indicadores Móviles',            w: 2 },
+            { kw: 'kpis',                       sol: 'BUI', srv: 'Indicadores Móviles',            w: 3 },
+            { kw: 'kpi',                        sol: 'BUI', srv: 'Indicadores Móviles',            w: 3 },
+            { kw: 'dashboard',                  sol: 'BUI', srv: 'Indicadores Móviles',            w: 3 },
+            { kw: 'metricas',                   sol: 'BUI', srv: 'Indicadores Móviles',            w: 2 },
+            { kw: 'estadisticas',               sol: 'BUI', srv: 'Geodata',                        w: 1 },
+
+            // --- MOM: Mobile Marketing ---
+            { kw: 'mensajes rcs',               sol: 'MOM', srv: 'Mensajes RCS',                   w: 3 },
+            { kw: 'rcs',                        sol: 'MOM', srv: 'Mensajes RCS',                   w: 3 },
+            { kw: 'mensajes multimedia',        sol: 'MOM', srv: 'Mensajes RCS',                   w: 2 },
+            { kw: 'imagenes en mensajes',       sol: 'MOM', srv: 'Mensajes RCS',                   w: 2 },
+            { kw: 'internet patrocinado',       sol: 'MOM', srv: 'Internet Patrocinado',           w: 3 },
+            { kw: 'datos patrocinados',         sol: 'MOM', srv: 'Internet Patrocinado',           w: 3 },
+            { kw: 'navegacion gratuita',        sol: 'MOM', srv: 'Internet Patrocinado',           w: 3 },
+            { kw: 'zero rating',                sol: 'MOM', srv: 'Internet Patrocinado',           w: 3 },
+            { kw: 'distribucion de aplicaciones', sol: 'MOM', srv: 'Distribución de Aplicaciones', w: 3 },
+            { kw: 'distribucion de apps',       sol: 'MOM', srv: 'Distribución de Aplicaciones',   w: 3 },
+            { kw: 'preinstalar app',            sol: 'MOM', srv: 'Distribución de Aplicaciones',   w: 3 },
+            { kw: 'lanzamiento de app',         sol: 'MOM', srv: 'Distribución de Aplicaciones',   w: 3 },
+            { kw: 'mensajeria masiva',          sol: 'MOM', srv: 'Mensajería Masiva',              w: 3 },
+            { kw: 'sms masivo',                 sol: 'MOM', srv: 'Mensajería Masiva',              w: 3 },
+            { kw: 'sms',                        sol: 'MOM', srv: 'Mensajería Masiva',              w: 2 },
+            { kw: 'campana de sms',             sol: 'MOM', srv: 'Mensajería Masiva',              w: 3 },
+            { kw: 'envio masivo',               sol: 'MOM', srv: 'Mensajería Masiva',              w: 2 },
+            { kw: 'recompensas',                sol: 'MOM', srv: 'Recompensas',                    w: 3 },
+            { kw: 'fidelizacion',               sol: 'MOM', srv: 'Recompensas',                    w: 3 },
+            { kw: 'loyalty',                    sol: 'MOM', srv: 'Recompensas',                    w: 3 },
+            { kw: 'programa de lealtad',        sol: 'MOM', srv: 'Recompensas',                    w: 3 },
+            { kw: 'puntos de lealtad',          sol: 'MOM', srv: 'Recompensas',                    w: 3 },
+            { kw: 'marketing movil',            sol: 'MOM', srv: 'Mensajería Masiva',              w: 2 },
+            { kw: 'campana de marketing',       sol: 'MOM', srv: 'Mensajería Masiva',              w: 2 },
+
+            // --- COE: Comunicación Empresarial ---
+            { kw: 'control de ventas',          sol: 'COE', srv: 'Control de Ventas',              w: 3 },
+            { kw: 'ventas en campo',            sol: 'COE', srv: 'Control de Ventas',              w: 3 },
+            { kw: 'pedidos',                    sol: 'COE', srv: 'Control de Ventas',              w: 2 },
+            { kw: 'cotizaciones',               sol: 'COE', srv: 'Control de Ventas',              w: 2 },
+            { kw: 'verum',                      sol: 'COE', srv: 'Formularios Verum',              w: 3 },
+            { kw: 'formularios digitales',      sol: 'COE', srv: 'Formularios Verum',              w: 3 },
+            { kw: 'check-in',                   sol: 'COE', srv: 'Formularios Verum',              w: 2 },
+            { kw: 'checkin',                    sol: 'COE', srv: 'Formularios Verum',              w: 2 },
+            { kw: 'evidencias fotograficas',    sol: 'COE', srv: 'Formularios Verum',              w: 3 },
+            { kw: 'captura de datos en campo',  sol: 'COE', srv: 'Formularios Verum',              w: 3 },
+            { kw: 'sekur',                      sol: 'COE', srv: 'SekurMessenger',                 w: 3 },
+            { kw: 'mensajeria segura',          sol: 'COE', srv: 'SekurMessenger',                 w: 3 },
+            { kw: 'mensajeria encriptada',      sol: 'COE', srv: 'SekurMessenger',                 w: 3 },
+            { kw: 'chat privado',               sol: 'COE', srv: 'SekurMessenger',                 w: 3 },
+            { kw: 'mensajes cifrados',          sol: 'COE', srv: 'SekurMessenger',                 w: 3 },
+            { kw: 'encriptacion',               sol: 'COE', srv: 'SekurMessenger',                 w: 2 },
+            { kw: 'push to talk',               sol: 'COE', srv: 'Push to Talk',                   w: 3 },
+            { kw: 'ptt',                        sol: 'COE', srv: 'Push to Talk',                   w: 3 },
+            { kw: 'walkie talkie',              sol: 'COE', srv: 'Push to Talk',                   w: 3 },
+            { kw: 'comunicacion instantanea',   sol: 'COE', srv: 'Push to Talk',                   w: 2 },
+            { kw: 'radio comunicacion',         sol: 'COE', srv: 'Push to Talk',                   w: 2 },
+
+            // --- COV: Conectividad Telcel ---
+            { kw: 'esim',                       sol: 'COV', srv: 'eSIM',                           w: 3 },
+            { kw: 'sim virtual',                sol: 'COV', srv: 'eSIM',                           w: 3 },
+            { kw: 'm2m',                        sol: 'COV', srv: 'Conectividad Avanzada M2M',      w: 3 },
+            { kw: 'maquina a maquina',          sol: 'COV', srv: 'Conectividad Avanzada M2M',      w: 3 },
+            { kw: 'iot',                        sol: 'COV', srv: 'Conectividad Avanzada M2M',      w: 3 },
+            { kw: 'sensores conectados',        sol: 'COV', srv: 'Conectividad Avanzada M2M',      w: 3 },
+            { kw: 'automatizacion',             sol: 'COV', srv: 'Conectividad Avanzada M2M',      w: 2 },
+            { kw: 'dispositivos conectados',    sol: 'COV', srv: 'Conectividad Avanzada M2M',      w: 2 },
+            { kw: 'red privada',                sol: 'COV', srv: 'Redes Privadas de Datos',        w: 3 },
+            { kw: 'apn',                        sol: 'COV', srv: 'Redes Privadas de Datos',        w: 3 },
+            { kw: 'vpn movil',                  sol: 'COV', srv: 'Redes Privadas de Datos',        w: 3 },
+            { kw: 'red corporativa',            sol: 'COV', srv: 'Redes Privadas de Datos',        w: 3 },
+            { kw: 'enlace dedicado',            sol: 'COV', srv: 'Redes Privadas de Datos',        w: 3 },
+            { kw: 'internet gestionado',        sol: 'COV', srv: 'Internet Gestionado',            w: 3 },
+            { kw: 'internet administrado',      sol: 'COV', srv: 'Internet Gestionado',            w: 3 },
+            { kw: 'conectividad',               sol: 'COV', srv: 'Conectividad Avanzada M2M',      w: 1 },
+
+            // --- GVT: Gestión Vehicular Telcel ---
+            { kw: 'video a bordo',              sol: 'GVT', srv: 'Video a bordo',                  w: 3 },
+            { kw: 'camaras en vehiculo',        sol: 'GVT', srv: 'Video a bordo',                  w: 3 },
+            { kw: 'dashcam',                    sol: 'GVT', srv: 'Video a bordo',                  w: 3 },
+            { kw: 'siniestro',                  sol: 'GVT', srv: 'Video a bordo',                  w: 2 },
+            { kw: 'cadena de frio',             sol: 'GVT', srv: 'Cadena de Frío',                 w: 3 },
+            { kw: 'refrigeracion',              sol: 'GVT', srv: 'Cadena de Frío',                 w: 3 },
+            { kw: 'temperatura de transporte',  sol: 'GVT', srv: 'Cadena de Frío',                 w: 3 },
+            { kw: 'perecederos',                sol: 'GVT', srv: 'Cadena de Frío',                 w: 3 },
+            { kw: 'habitos de conduccion',      sol: 'GVT', srv: 'Hábitos de Conducción',          w: 3 },
+            { kw: 'conduccion segura',          sol: 'GVT', srv: 'Hábitos de Conducción',          w: 3 },
+            { kw: 'comportamiento del chofer',  sol: 'GVT', srv: 'Hábitos de Conducción',          w: 3 },
+            { kw: 'choferes',                   sol: 'GVT', srv: 'Hábitos de Conducción',          w: 2 },
+            { kw: 'combustible',                sol: 'GVT', srv: 'Medición de Combustible',        w: 3 },
+            { kw: 'gasolina',                   sol: 'GVT', srv: 'Medición de Combustible',        w: 3 },
+            { kw: 'consumo de combustible',     sol: 'GVT', srv: 'Medición de Combustible',        w: 3 },
+            { kw: 'ordena de gasolina',         sol: 'GVT', srv: 'Medición de Combustible',        w: 3 },
+            { kw: 'ruteo',                      sol: 'GVT', srv: 'Módulo de Ruteo',                w: 3 },
+            { kw: 'optimizacion de rutas',      sol: 'GVT', srv: 'Módulo de Ruteo',                w: 3 },
+            { kw: 'rutas de distribucion',      sol: 'GVT', srv: 'Módulo de Ruteo',                w: 3 },
+            { kw: 'telemetria',                 sol: 'GVT', srv: 'Telemetría',                     w: 3 },
+            { kw: 'obd',                        sol: 'GVT', srv: 'Telemetría',                     w: 3 },
+            { kw: 'diagnostico vehicular',      sol: 'GVT', srv: 'Telemetría',                     w: 3 },
+            { kw: 'mantenimiento preventivo',   sol: 'GVT', srv: 'Telemetría',                     w: 2 },
+            { kw: 'flotilla',                   sol: 'GVT', srv: 'Telemetría',                     w: 2 },
+            { kw: 'flota vehicular',            sol: 'GVT', srv: 'Telemetría',                     w: 2 },
+            { kw: 'vehiculos',                  sol: 'GVT', srv: 'Telemetría',                     w: 2 },
+            { kw: 'gps vehicular',              sol: 'GVT', srv: 'Telemetría',                     w: 3 },
+            { kw: 'rastreo vehicular',          sol: 'GVT', srv: 'Telemetría',                     w: 3 },
+        ];
+
+        // ===== SERVICIOS POR SOLUCIÓN (usando los mismos codes que producción) =====
+        const serviciosPorSol = {
+            SEG: ['Control de Dispositivos MDM', 'Control Móvil Empresarial', 'Norton Antivirus Empresarial', 'Lookout', 'VMware Workspace ONE'],
+            GFC: ['Localización Empresarial', 'Cobranza', 'Promotoría y Merchandising', 'Servicios en Campo', 'Control de Sucursales', 'Seguridad', 'Logística'],
+            SEC: ['Microsoft 365', 'Hosting y Desarrollo Web', 'Claro Drive Negocio', 'Google Workspace'],
+            BUI: ['Geodata', 'Autenticación Móvil', 'Indicadores Móviles'],
+            MOM: ['Mensajes RCS', 'Internet Patrocinado', 'Distribución de Aplicaciones', 'Mensajería Masiva', 'Recompensas'],
+            COE: ['Control de Ventas', 'Formularios Verum', 'SekurMessenger', 'Push to Talk'],
+            COV: ['eSIM', 'Conectividad Avanzada M2M', 'Redes Privadas de Datos', 'Internet Gestionado'],
+            GVT: ['Video a bordo', 'Cadena de Frío', 'Hábitos de Conducción', 'Medición de Combustible', 'Módulo de Ruteo', 'Telemetría']
+        };
+
+        // Nombres display de las soluciones (code → label)
+        const solNombres = {
+            COV: 'Conectividad Telcel',
+            COE: 'Comunicación Empresarial',
+            SEG: 'Seguridad',
+            SEC: 'Servicios Cloud',
+            BUI: 'Business Intelligence',
+            MOM: 'Mobile Marketing',
+            GVT: 'Gestión Vehicular Telcel',
+            GFC: 'Gestión de Fuerza en Campo'
+        };
+
+        let lastDetectedResult = null;
 
         // ===== INICIALIZACIÓN =====
         document.addEventListener('DOMContentLoaded', function() {
-            const mensajeInput = document.getElementById('mensaje');
-            const solucionSelect = document.getElementById('solucion');
-            const servicioSelect = document.getElementById('servicio');
+            const mensajeInput   = document.getElementById('Mensaje');
+            const solucionSelect = document.getElementById('SolucionSelect');
+            const servicioSelect = document.getElementById('ServicioInteres');
+            const estadoSelect   = document.getElementById('Estado');
+            const municipioSelect= document.getElementById('Municipio');
+            const cargoSelect    = document.getElementById('Cargo');
+            const otroCargoRow   = document.getElementById('other-cargo-row');
+            const otroCargoInput = document.getElementById('OtroCargo');
+            const regionInput    = document.getElementById('Region');
+            const estadoNombreInput = document.getElementById('EstadoNombreInput');
+            const solHidden      = document.getElementById('solHidden');
 
-            // Cargar servicios según solución (sin detección)
-            solucionSelect.addEventListener('change', loadServicios);
+            // --- Municipio cascading ---
+            estadoSelect.addEventListener('change', function() {
+                const estadoId = this.value;
+                const selectedOption = this.options[this.selectedIndex];
+                regionInput.value = '';
+                estadoNombreInput.value = selectedOption.text;
 
-            // Detección al escribir en mensaje
-            mensajeInput.addEventListener('input', function() {
+                municipioSelect.innerHTML = '<option value="">Selecciona un municipio</option>';
+                if (!estadoId) {
+                    municipioSelect.disabled = true;
+                    return;
+                }
+                const munis = municipiosPorEstado[estadoId] || [];
+                munis.forEach(m => {
+                    const opt = document.createElement('option');
+                    opt.value = m;
+                    opt.textContent = m;
+                    municipioSelect.appendChild(opt);
+                });
+                municipioSelect.disabled = munis.length === 0;
+            });
+
+            // --- Cargo → OtroCargo condicional ---
+            cargoSelect.addEventListener('change', function() {
+                if (this.value === 'Otro') {
+                    otroCargoRow.style.display = '';
+                } else {
+                    otroCargoRow.style.display = 'none';
+                    otroCargoInput.value = '';
+                }
+            });
+
+            // --- Solución → Servicio (selección manual) ---
+            solucionSelect.addEventListener('change', function() {
+                const code = this.value;
+                solHidden.value = solNombres[code] || '';
+                llenarServicios(code);
+            });
+
+            // --- Detección al abandonar el campo de mensaje ---
+            mensajeInput.addEventListener('blur', function() {
                 detectarYActualizar(this.value);
             });
 
-            // Debug con Ctrl+Shift+D
+            // --- Debug con Ctrl+Shift+D ---
             document.addEventListener('keydown', function(e) {
                 if (e.ctrlKey && e.shiftKey && e.code === 'KeyD') {
                     document.getElementById('debug').classList.toggle('show');
                 }
             });
 
-            // Envío del formulario
+            // --- Envío del formulario ---
             document.getElementById('contactForm').addEventListener('submit', function(e) {
                 e.preventDefault();
-                alert('Formulario enviado con:\n- Solución: ' + document.getElementById('solucion').value + 
-                      '\n- Servicio: ' + document.getElementById('servicio').value);
+                const sol = solucionSelect.options[solucionSelect.selectedIndex].text;
+                const serv = servicioSelect.value;
+                alert('Formulario enviado con:\n' +
+                    '- Solución: ' + sol + '\n' +
+                    '- Servicio: ' + serv + '\n' +
+                    '- Estado: ' + estadoSelect.options[estadoSelect.selectedIndex].text + '\n' +
+                    '- Municipio: ' + municipioSelect.value);
             });
-
-            // Cargar servicios iniciales
-            loadServicios();
         });
 
-        // ===== FUNCIONES =====
-        function loadServicios() {
-            const solucionSelect = document.getElementById('solucion');
-            const servicioSelect = document.getElementById('servicio');
-            const selectedSol = solucionSelect.value;
+        // ===== LLENAR SERVICIOS =====
+        function llenarServicios(code) {
+            const servicioSelect = document.getElementById('ServicioInteres');
+            servicioSelect.innerHTML = '<option value="">Selecciona el servicio de tu interés</option>';
 
-            // Mapeo de soluciones a servicios (basado en el formulario original)
-            const serviciosMap = {
-                'Planes Empresariales': ['Plan Telcel Empresa', 'Plan Telcel Ultra Empresa'],
-                'Conectividad Telcel': ['eSIM', 'Conectividad Avanzada M2M', 'Redes Privadas de Datos'],
-                'Seguridad': ['Control de Dispositivos MDM', 'Control Móvil Empresarial', 'Norton Antivirus Empresarial', 'Lookout'],
-                'Servicios Cloud': ['Microsoft 365', 'Hosting y Desarrollo Web', 'Google Workspace', 'Claro Drive Negocio', 'VMware Workspace ONE'],
-                'Business Intelligence': ['GEODATA', 'Autenticación Móvil', 'Google Workspace', 'Indicadores móviles'],
-                'Mobile Marketing': ['Distribución de Aplicaciones', 'Datos Patrocinados', 'Recompensas', 'Mensajería Masiva Empresarial', 'Mensajes RCS'],
-                'Comunicación Empresarial': ['Control de Ventas', 'Formularios Verum', 'SekurMessenger', 'Push to Talk'],
-                'Gestión Vehicular Telcel': ['Medición de Combustible', 'Cadena de Frío', 'Telemetría', 'Modulo de Ruteo', 'Hábitos de Conducción', 'Video a bordo'],
-                'Gestión de Fuerza en Campo': ['Promotoría y Merchandising', 'Control de Sucursales', 'Servicios en Campo', 'Cobranza', 'Localización Empresarial Telcel', 'Logística']
-            };
-
-            const servicios = serviciosMap[selectedSol] || [];
-            servicioSelect.innerHTML = '<option value="">Selecciona un servicio</option>';
-            servicios.forEach(servicio => {
-                const option = document.createElement('option');
-                option.value = servicio;
-                option.textContent = servicio;
-                servicioSelect.appendChild(option);
-            });
-        }
-
-        function detectarYActualizar(texto) {
-            const textoLower = texto.toLowerCase().trim();
-
-            if (textoLower.length < 2) {
-                updateDebug(textoLower, '', '');
+            if (!code || !serviciosPorSol[code]) {
+                servicioSelect.disabled = true;
                 return;
             }
 
-            let coincidencia = null;
+            serviciosPorSol[code].forEach(txt => {
+                const opt = document.createElement('option');
+                opt.value = txt;
+                opt.textContent = txt;
+                servicioSelect.appendChild(opt);
+            });
+            servicioSelect.disabled = false;
+        }
 
-            // Buscar coincidencias (frases primero, luego palabras)
-            Object.keys(keywordMap).forEach(keyword => {
-                if (textoLower.includes(keyword)) {
-                    if (!coincidencia || keyword.length > coincidencia.length) {
-                        coincidencia = keyword;
-                    }
+        // ===== NORMALIZACIÓN DE TEXTO =====
+        function normalizarTexto(texto) {
+            return texto
+                .toLowerCase()
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '')  // quitar acentos
+                .replace(/[^a-z0-9\s\-]/g, ' ')   // solo alfanuméricos y guiones
+                .replace(/\s+/g, ' ')
+                .trim();
+        }
+
+        // ===== ANÁLISIS POR PUNTUACIÓN =====
+        function analizarMensaje(texto) {
+            const textoNorm = normalizarTexto(texto);
+            if (textoNorm.length < 3) return null;
+
+            const scoresSol = {};
+            const scoresSrv = {};
+
+            pesoMap.forEach(entry => {
+                if (textoNorm.includes(entry.kw)) {
+                    scoresSol[entry.sol] = (scoresSol[entry.sol] || 0) + entry.w;
+                    const srvKey = entry.sol + '|' + entry.srv;
+                    scoresSrv[srvKey] = (scoresSrv[srvKey] || 0) + entry.w;
                 }
             });
 
-            if (coincidencia && coincidencia !== lastDetectedKeyword) {
-                lastDetectedKeyword = coincidencia;
-                const config = keywordMap[coincidencia];
-                actualizarFormulario(config, coincidencia);
-                updateDebug(textoLower, coincidencia, config.solución);
-            } else if (!coincidencia) {
-                lastDetectedKeyword = null;
-                updateDebug(textoLower, '', '');
+            const soluciones = Object.keys(scoresSol);
+            if (soluciones.length === 0) return null;
+
+            // Solución con mayor puntaje acumulado
+            const solGanadora = soluciones.reduce((a, b) => scoresSol[a] >= scoresSol[b] ? a : b);
+
+            // Servicio con mayor puntaje dentro de la solución ganadora
+            const candidatos = Object.keys(scoresSrv)
+                .filter(k => k.startsWith(solGanadora + '|'))
+                .map(k => ({ srv: k.split('|')[1], score: scoresSrv[k] }));
+
+            const srvGanador = candidatos.length > 0
+                ? candidatos.reduce((a, b) => a.score >= b.score ? a : b).srv
+                : serviciosPorSol[solGanadora][0];
+
+            return { sol: solGanadora, srv: srvGanador, scores: scoresSol };
+        }
+
+        // ===== DETECCIÓN AL ABANDONAR EL CAMPO =====
+        function detectarYActualizar(texto) {
+            const textoNorm = normalizarTexto(texto);
+
+            if (textoNorm.length < 3) {
+                updateDebug(texto, '', '');
+                return;
+            }
+
+            const resultado = analizarMensaje(texto);
+
+            if (resultado) {
+                // Solo actualizar si el resultado cambió
+                const resultKey = resultado.sol + '|' + resultado.srv;
+                if (resultKey !== lastDetectedResult) {
+                    lastDetectedResult = resultKey;
+                    actualizarFormulario(resultado.sol, resultado.srv);
+                    updateDebug(texto, resultado.srv, resultado.sol);
+                }
+            } else {
+                lastDetectedResult = null;
+                updateDebug(texto, '', '');
             }
         }
 
-        function actualizarFormulario(config, keyword) {
-            const solucionSelect = document.getElementById('solucion');
-            const servicioSelect = document.getElementById('servicio');
+        function actualizarFormulario(sol, srv) {
+            const solucionSelect = document.getElementById('SolucionSelect');
+            const servicioSelect = document.getElementById('ServicioInteres');
+            const solHidden      = document.getElementById('solHidden');
 
             // Actualizar solución
-            solucionSelect.value = config.solución;
-            solucionSelect.dispatchEvent(new Event('change', { bubbles: true }));
+            solucionSelect.value = sol;
+            solHidden.value = solNombres[sol] || '';
+            llenarServicios(sol);
 
             // Pequeño delay para que carguen los servicios
             setTimeout(() => {
-                servicioSelect.value = config.servicio;
-                mostrarNotificacion(config.solución, config.servicio);
+                servicioSelect.value = srv;
+                mostrarNotificacion(solNombres[sol] || sol, srv);
             }, 100);
         }
 
@@ -640,7 +1027,7 @@
         function updateDebug(texto, keyword, solucion) {
             document.getElementById('debug-text').textContent = texto.substring(0, 30) + (texto.length > 30 ? '...' : '');
             document.getElementById('debug-keyword').textContent = keyword || '-';
-            document.getElementById('debug-solution').textContent = solucion || '-';
+            document.getElementById('debug-solution').textContent = (solucion ? (solNombres[solucion] || solucion) : '-');
         }
     </script>
 </body>

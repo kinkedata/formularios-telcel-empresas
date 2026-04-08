@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard · Análisis de Leads por Detección Inteligente</title>
+<style>
+  :root {
+    --red: #DA291C;
+    --blue-dark: #003087;
+    --teal: #00A0D2;
+    --teal-light: #e6f6fb;
+    --gray-bg: #f4f6f9;
+    --gray-border: #dde3ec;
+    --text-dark: #1a2340;
+    --text-mid: #4a5568;
+    --text-light: #718096;
+    --green: #27ae60;
+    --yellow: #e6a817;
+    --red-badge: #e53935;
+    --gray-badge: #8a9ab0;
+    --white: #ffffff;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--gray-bg);
+    color: var(--text-dark);
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  /* HEADER */
+  .header {
+    background: linear-gradient(135deg, var(--blue-dark) 0%, #004ab3 100%);
+    color: white;
+    padding: 28px 36px 24px;
+    border-bottom: 4px solid var(--red);
+  }
+  .header-top { display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+  .header h1 { font-size: 22px; font-weight: 700; letter-spacing: -0.3px; }
+  .header h1 span { color: var(--teal); }
+  .header-date { background: rgba(255,255,255,0.12); border-radius: 6px; padding: 6px 14px; font-size: 13px; white-space: nowrap; }
+  .header-meta { margin-top: 14px; display: flex; gap: 20px; flex-wrap: wrap; }
+  .meta-pill {
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 20px;
+    padding: 5px 14px;
+    font-size: 12px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .meta-pill strong { font-size: 16px; font-weight: 700; }
+  /* MAIN */
+  .main { max-width: 1200px; margin: 0 auto; padding: 28px 20px; }
+  /* SECTION TITLE */
+  .section-title {
+    font-size: 13px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.8px; color: var(--teal); margin-bottom: 14px;
+    padding-left: 10px; border-left: 3px solid var(--teal);
+  }
+  /* CARDS */
+  .cards-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 14px; margin-bottom: 32px; }
+  .card {
+    background: var(--white);
+    border-radius: 10px;
+    padding: 18px 16px;
+    box-shadow: 0 1px 4px rgba(0,48,135,0.08);
+    border-top: 3px solid var(--teal);
+    transition: box-shadow 0.15s;
+  }
+  .card:hover { box-shadow: 0 4px 14px rgba(0,48,135,0.13); }
+  .card.green { border-top-color: var(--green); }
+  .card.yellow { border-top-color: var(--yellow); }
+  .card.red { border-top-color: var(--red-badge); }
+  .card.gray { border-top-color: var(--gray-badge); }
+  .card.scope { border-top-color: var(--blue-dark); }
+  .card-val { font-size: 34px; font-weight: 800; line-height: 1; margin-bottom: 6px; color: var(--blue-dark); }
+  .card.green .card-val { color: var(--green); }
+  .card.yellow .card-val { color: var(--yellow); }
+  .card.red .card-val { color: var(--red-badge); }
+  .card.gray .card-val { color: var(--gray-badge); }
+  .card.scope .card-val { color: var(--blue-dark); }
+  .card-label { font-size: 12px; color: var(--text-mid); font-weight: 600; line-height: 1.3; }
+  .card-sub { font-size: 11px; color: var(--text-light); margin-top: 3px; }
+  /* BAR CHART */
+  .chart-box {
+    background: var(--white);
+    border-radius: 10px;
+    padding: 22px 24px;
+    box-shadow: 0 1px 4px rgba(0,48,135,0.08);
+    margin-bottom: 28px;
+  }
+  .bar-legend { display: flex; gap: 18px; margin-bottom: 16px; flex-wrap: wrap; }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-mid); }
+  .legend-dot { width: 11px; height: 11px; border-radius: 2px; flex-shrink: 0; }
+  .bar-row { margin-bottom: 12px; }
+  .bar-label { font-size: 12px; font-weight: 600; color: var(--text-dark); margin-bottom: 4px; display: flex; justify-content: space-between; }
+  .bar-label span { font-size: 11px; font-weight: 400; color: var(--text-light); }
+  .bar-track { background: var(--gray-bg); border-radius: 4px; height: 22px; display: flex; overflow: hidden; }
+  .bar-seg { height: 100%; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; color: white; min-width: 0; transition: width 0.3s; }
+  .bar-seg.coincide { background: var(--green); }
+  .bar-seg.sol-ok { background: var(--yellow); }
+  .bar-seg.no-coin { background: var(--red-badge); }
+  .bar-seg.sin-signal { background: var(--gray-badge); }
+  /* TABLES */
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; }
+  thead th {
+    background: var(--blue-dark); color: white;
+    padding: 10px 12px; text-align: left; font-size: 11px;
+    font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
+    position: sticky; top: 0;
+  }
+  tbody tr:nth-child(even) { background: var(--teal-light); }
+  tbody tr:hover { background: #ddeef7; }
+  tbody td { padding: 8px 12px; font-size: 12px; color: var(--text-dark); border-bottom: 1px solid var(--gray-border); vertical-align: middle; }
+  /* BADGES */
+  .badge {
+    display: inline-block; border-radius: 12px; padding: 3px 10px;
+    font-size: 11px; font-weight: 700; white-space: nowrap;
+  }
+  .badge-green { background: #e7f9f0; color: #1a7a45; border: 1px solid #a8e6c2; }
+  .badge-yellow { background: #fef9e7; color: #7d5a00; border: 1px solid #f5d76e; }
+  .badge-red { background: #fdecea; color: #b71c1c; border: 1px solid #f5a3a0; }
+  .badge-gray { background: #edf0f4; color: #4a5568; border: 1px solid #bcc5d3; }
+  .badge-blue { background: #e8effa; color: #003087; border: 1px solid #9ab3d9; }
+  /* INSIGHTS */
+  .insights-list { list-style: none; }
+  .insights-list li {
+    padding: 12px 14px 12px 40px;
+    position: relative;
+    border-left: 3px solid var(--teal);
+    margin-bottom: 10px;
+    background: var(--teal-light);
+    border-radius: 0 8px 8px 0;
+    font-size: 13px;
+    color: var(--text-dark);
+  }
+  .insights-list li::before {
+    content: attr(data-num);
+    position: absolute; left: 10px; top: 12px;
+    width: 20px; height: 20px; border-radius: 50%;
+    background: var(--teal); color: white;
+    font-size: 11px; font-weight: 800;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .insights-list li strong { color: var(--blue-dark); }
+  /* MISMATCH TABLE */
+  .mismatch-detected { color: var(--red-badge); font-weight: 700; }
+  .mismatch-selected { color: var(--text-mid); }
+  /* FOOTER */
+  .footer { text-align: center; padding: 20px; color: var(--text-light); font-size: 11px; margin-top: 10px; }
+  /* RESPONSIVE */
+  @media(max-width:700px) {
+    .header { padding: 18px 16px; }
+    .main { padding: 16px 10px; }
+    .cards-row { grid-template-columns: repeat(2, 1fr); }
+    .chart-box, .table-wrap { font-size: 12px; }
+  }
+  .section-gap { margin-bottom: 32px; }
+  .sol-tag { display: inline-block; background: var(--blue-dark); color: white; border-radius: 4px; padding: 1px 7px; font-size: 10px; font-weight: 700; margin-right: 4px; }
+  .empresa-cell { font-weight: 600; color: var(--blue-dark); }
+  .msg-cell { color: var(--text-mid); font-style: italic; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-top">
+    <h1>Dashboard · Análisis de Leads por <span>Detección IA</span></h1>
+    <div class="header-date">📅 23/03/2026</div>
+  </div>
+ <!-- <div class="header-meta">
+    <div class="meta-pill">Total registros: <strong>341</strong></div>
+    <div class="meta-pill">Registros TEST eliminados: <strong>20</strong></div>
+    <div class="meta-pill">Leads reales totales: <strong>321</strong></div>
+    <div class="meta-pill">Analizados (sin Planes Emp.): <strong>138</strong></div>
+    <div class="meta-pill">Fuera de scope (Planes Emp.): <strong>104</strong></div>
+    <div class="meta-pill">Descartados (sin mensaje válido): <strong>79</strong></div>
+  </div>-->
+</div>
+
+<div class="main">
+
+  <!-- SUMMARY CARDS -->
+  <div class="section-title">Resumen de Detección — 138 leads analizados</div>
+  <div class="cards-row">
+    <div class="card green">
+      <div class="card-val">36%</div>
+      <div class="card-label">Coincide exactamente</div>
+      <div class="card-sub">Solución + servicio correcto (50 leads)</div>
+    </div>
+    <div class="card yellow">
+      <div class="card-val">44%</div>
+      <div class="card-label">Solución correcta</div>
+      <div class="card-sub">Solución OK, servicio difiere (61 leads)</div>
+    </div>
+    <div class="card red">
+      <div class="card-val">7%</div>
+      <div class="card-label">No coincide</div>
+      <div class="card-sub">Solución detectada distinta (10 leads)</div>
+    </div>
+    <div class="card gray">
+      <div class="card-val">12%</div>
+      <div class="card-label">Sin señal</div>
+      <div class="card-sub">Sin palabras clave (17 leads)</div>
+    </div>
+    <div class="card scope">
+      <div class="card-val">104</div>
+      <div class="card-label">Fuera de scope</div>
+      <div class="card-sub">Planes Empresariales (PNE/PTE/TEU)</div>
+    </div>
+  </div>
+
+  <!-- CHART 1: BY SOLUTION -->
+  <div class="section-gap">
+    <div class="section-title">Distribución por solución (leads analizados)</div>
+    <div class="chart-box">
+      <div class="bar-legend">
+        <div class="legend-item"><div class="legend-dot" style="background:var(--green)"></div> Coincide exactamente</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--yellow)"></div> Solución correcta</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--red-badge)"></div> No coincide</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--gray-badge)"></div> Sin señal</div>
+      </div>
+
+      <!-- COV: 28 leads. Coincide=6, Sol OK=14, No coincide=5, Sin señal=3 -->
+      <div class="bar-row">
+        <div class="bar-label">
+          <span><strong>COV</strong> — Conectividad Telcel</span>
+          <span>28 leads</span>
+        </div>
+        <div class="bar-track">
+          <div class="bar-seg coincide" style="width:21.4%" title="6 coinciden">6</div>
+          <div class="bar-seg sol-ok" style="width:50%" title="14 sol. correcta">14</div>
+          <div class="bar-seg no-coin" style="width:17.9%" title="5 no coincide">5</div>
+          <div class="bar-seg sin-signal" style="width:10.7%" title="3 sin señal">3</div>
+        </div>
+      </div>
+
+      <!-- COE: 12 leads. Coincide=2, Sol OK=6, No coincide=1, Sin señal=3 -->
+      <div class="bar-row">
+        <div class="bar-label">
+          <span><strong>COE</strong> — Comunicación Empresarial</span>
+          <span>12 leads</span>
+        </div>
+        <div class="bar-track">
+          <div class="bar-seg coincide" style="width:16.7%" title="2 coinciden">2</div>
+          <div class="bar-seg sol-ok" style="width:50%" title="6 sol. correcta">6</div>
+          <div class="bar-seg no-coin" style="width:8.3%" title="1 no coincide">1</div>
+          <div class="bar-seg sin-signal" style="width:25%" title="3 sin señal">3</div>
+        </div>
+      </div>
+
+      <!-- SEG: 10 leads. Coincide=3, Sol OK=2, No coincide=2, Sin señal=3 -->
+      <div class="bar-row">
+        <div class="bar-label">
+          <span><strong>SEG</strong> — Seguridad</span>
+          <span>10 leads</span>
+        </div>
+        <div class="bar-track">
+          <div class="bar-seg coincide" style="width:30%" title="3 coinciden">3</div>
+          <div class="bar-seg sol-ok" style="width:20%" title="2 sol. correcta">2</div>
+          <div class="bar-seg no-coin" style="width:20%" title="2 no coincide">2</div>
+          <div class="bar-seg sin-signal" style="width:30%" title="3 sin señal">3</div>
+        </div>
+      </div>
+
+      <!-- SEC: 3 leads. Coincide=1, Sol OK=0, No coincide=1, Sin señal=1 -->
+      <div class="bar-row">
+        <div class="bar-label">
+          <span><strong>SEC</strong> — Servicios Cloud</span>
+          <span>3 leads</span>
+        </div>
+        <div class="bar-track">
+          <div class="bar-seg coincide" style="width:33.3%" title="1 coincide">1</div>
+          <div class="bar-seg sol-ok" style="width:0%"></div>
+          <div class="bar-seg no-coin" style="width:33.3%" title="1 no coincide">1</div>
+          <div class="bar-seg sin-signal" style="width:33.3%" title="1 sin señal">1</div>
+        </div>
+      </div>
+
+      <!-- BUI: 18 leads. Coincide=1, Sol OK=3, No coincide=1, Sin señal=13 -->
+      <div class="bar-row">
+        <div class="bar-label">
+          <span><strong>BUI</strong> — Business Intelligence</span>
+          <span>18 leads</span>
+        </div>
+        <div class="bar-track">
+          <div class="bar-seg coincide" style="width:5.6%" title="1 coincide">1</div>
+          <div class="bar-seg sol-ok" style="width:16.7%" title="3 sol. correcta">3</div>
+          <div class="bar-seg no-coin" style="width:5.6%" title="1 no coincide">1</div>
+          <div class="bar-seg sin-signal" style="width:72.2%" title="13 sin señal">13</div>
+        </div>
+      </div>
+
+      <!-- MOM: 3 leads. Coincide=1, Sol OK=1, No coincide=0, Sin señal=1 -->
+      <div class="bar-row">
+        <div class="bar-label">
+          <span><strong>MOM</strong> — Mobile Marketing</span>
+          <span>3 leads</span>
+        </div>
+        <div class="bar-track">
+          <div class="bar-seg coincide" style="width:33.3%" title="1 coincide">1</div>
+          <div class="bar-seg sol-ok" style="width:33.3%" title="1 sol. correcta">1</div>
+          <div class="bar-seg no-coin" style="width:0%"></div>
+          <div class="bar-seg sin-signal" style="width:33.3%" title="1 sin señal">1</div>
+        </div>
+      </div>
+
+      <!-- GVT: 21 leads. Coincide=8, Sol OK=8, No coincide=0, Sin señal=5 -->
+      <div class="bar-row">
+        <div class="bar-label">
+          <span><strong>GVT</strong> — Gestión Vehicular Telcel</span>
+          <span>21 leads</span>
+        </div>
+        <div class="bar-track">
+          <div class="bar-seg coincide" style="width:38.1%" title="8 coinciden">8</div>
+          <div class="bar-seg sol-ok" style="width:38.1%" title="8 sol. correcta">8</div>
+          <div class="bar-seg no-coin" style="width:0%"></div>
+          <div class="bar-seg sin-signal" style="width:23.8%" title="5 sin señal">5</div>
+        </div>
+      </div>
+
+      <!-- GFC: 23 leads. Coincide=28, Sol OK=16, No coincide=0, Sin señal=0 -->
+      <!-- Wait - recalculate: Coincide=9, Sol OK=7, No coincide=0, Sin señal=7 based on actual data -->
+      <div class="bar-row">
+        <div class="bar-label">
+          <span><strong>GFC</strong> — Gestión de Fuerza en Campo</span>
+          <span>23 leads</span>
+        </div>
+        <div class="bar-track">
+          <div class="bar-seg coincide" style="width:39.1%" title="9 coinciden">9</div>
+          <div class="bar-seg sol-ok" style="width:30.4%" title="7 sol. correcta">7</div>
+          <div class="bar-seg no-coin" style="width:0%"></div>
+          <div class="bar-seg sin-signal" style="width:30.4%" title="7 sin señal">7</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CHART 2: MISMATCH TABLE -->
+  <div class="section-gap">
+    <div class="section-title">Leads con detección divergente (No coincide / Solución incorrecta)</div>
+    <div class="chart-box">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Empresa</th>
+              <th>Solución seleccionada</th>
+              <th>Solución detectada</th>
+              <th>Servicio seleccionado</th>
+              <th>Servicio detectado</th>
+              <th>Mensaje (extracto)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="empresa-cell">Leviatan acuaLogistica</td>
+              <td><span class="badge badge-blue">BUI</span> Business Intelligence</td>
+              <td class="mismatch-detected"><span class="badge badge-red">COV</span> Conectividad</td>
+              <td>GEODATA</td>
+              <td>Conectividad Avanzada M2M</td>
+              <td class="msg-cell">"Estoy buscando planes de datos para IoT tipo pool"</td>
+            </tr>
+            <tr>
+              <td class="empresa-cell">GRUPO CHILUAJI</td>
+              <td><span class="badge badge-blue">COV</span> Conectividad Telcel</td>
+              <td class="mismatch-detected"><span class="badge badge-gray">–</span> Sin señal</td>
+              <td>Conectividad Avanzada M2M</td>
+              <td>—</td>
+              <td class="msg-cell">"Hola quiero más información para la contratación de internet,"</td>
+            </tr>
+            <tr>
+              <td class="empresa-cell">Contar numeros</td>
+              <td><span class="badge badge-blue">SEG</span> Seguridad</td>
+              <td class="mismatch-detected"><span class="badge badge-gray">–</span> Sin señal</td>
+              <td>Norton Antivirus Empresarial</td>
+              <td>—</td>
+              <td class="msg-cell">"Hola ayudenme a contar los numeros ya que soy contador podrian llamarme?"</td>
+            </tr>
+            <tr>
+              <td class="empresa-cell">Conflictos y Problemas Soluciones</td>
+              <td><span class="badge badge-blue">COE</span> Comunicación Empresarial</td>
+              <td class="mismatch-detected"><span class="badge badge-gray">–</span> Sin señal</td>
+              <td>Control de Ventas</td>
+              <td>—</td>
+              <td class="msg-cell">"Ayuda con interfón"</td>
+            </tr>
+            <tr>
+              <td class="empresa-cell">Insertec Industrial</td>
+              <td><span class="badge badge-blue">BUI</span> Business Intelligence</td>
+              <td class="mismatch-detected"><span class="badge badge-gray">–</span> Sin señal</td>
+              <td>Indicadores móviles</td>
+              <td>—</td>
+              <td class="msg-cell">"deseo tener contacto con un ejecutivo ya que queremos renovar equipos"</td>
+            </tr>
+            <tr>
+              <td class="empresa-cell">LATITUD PROMOCIONALES</td>
+              <td><span class="badge badge-blue">SEC</span> Servicios Cloud</td>
+              <td class="mismatch-detected"><span class="badge badge-gray">–</span> Sin señal</td>
+              <td>Microsoft 365</td>
+              <td>—</td>
+              <td class="msg-cell">"...interés en convertirnos en proveedores del área de marketing..."</td>
+            </tr>
+            <tr>
+              <td class="empresa-cell">TRANSPORTES FRALSE</td>
+              <td><span class="badge badge-blue">GVT</span> Gestión Vehicular</td>
+              <td class="mismatch-detected"><span class="badge badge-red">GFC</span> Gestión Fuerza Campo</td>
+              <td>Módulo de Ruteo</td>
+              <td>Localización Empresarial</td>
+              <td class="msg-cell">"Estoy buscando un GPS para las unidades que tenemos"</td>
+            </tr>
+            <tr>
+              <td class="empresa-cell">AGROBELA AGROQUIMICOS</td>
+              <td><span class="badge badge-blue">GVT</span> Gestión Vehicular</td>
+              <td class="mismatch-detected"><span class="badge badge-red">GFC</span> Gestión Fuerza Campo</td>
+              <td>Módulo de Ruteo</td>
+              <td>Localización Empresarial</td>
+              <td class="msg-cell">"sistema de GPS para un aproximado de 10 unidades"</td>
+            </tr>
+            <tr>
+              <td class="empresa-cell">sellos mecanicos de occidente</td>
+              <td><span class="badge badge-blue">SEG</span> Seguridad</td>
+              <td class="mismatch-detected"><span class="badge badge-red">GVT</span> Gest. Vehicular</td>
+              <td>Control Móvil Empresarial</td>
+              <td>GPS Vehicular</td>
+              <td class="msg-cell">"instalar GPS a nuestros vehículos empresariales"</td>
+            </tr>
+            <tr>
+              <td class="empresa-cell">GALMICHE Y ASOCIADOS</td>
+              <td><span class="badge badge-blue">SEG</span> Seguridad</td>
+              <td class="mismatch-detected"><span class="badge badge-red">GVT</span> Gest. Vehicular</td>
+              <td>Control Móvil Empresarial</td>
+              <td>GPS Vehicular / Telemetría</td>
+              <td class="msg-cell">"gestión vehicular por favor necesitamos informacion para vehículos"</td>
+            </tr>
+            <tr>
+              <td class="empresa-cell">BAHIA SOLAR</td>
+              <td><span class="badge badge-blue">GVT</span> Gestión Vehicular</td>
+              <td class="mismatch-detected"><span class="badge badge-red">GVT</span> GVT — Telemetría</td>
+              <td>Telemetría</td>
+              <td>Telemetría ✓</td>
+              <td class="msg-cell">"Ya contamos con un servicio de Telemetría por su parte, pero nos gustaría adquirir mas"</td>
+            </tr>
+            <tr>
+              <td class="empresa-cell">GRUPO COFLYAR</td>
+              <td><span class="badge badge-blue">BUI</span> Business Intelligence</td>
+              <td class="mismatch-detected"><span class="badge badge-red">COV</span> Conectividad</td>
+              <td>Indicadores Móviles</td>
+              <td>Conectividad Avanzada M2M</td>
+              <td class="msg-cell">"15 a 20 sims para instalar en camaras de seguridad para vehículos...data pooling"</td>
+            </tr>
+            <tr>
+              <td class="empresa-cell">Psicosmart México</td>
+              <td><span class="badge badge-blue">COV</span> Conectividad Telcel</td>
+              <td class="mismatch-detected"><span class="badge badge-gray">–</span> Sin señal</td>
+              <td>eSIM</td>
+              <td>—</td>
+              <td class="msg-cell">"cotización para un plan básico que abarque 20 líneas telefónicas..."</td>
+            </tr>
+            <tr>
+              <td class="empresa-cell">OPERADORA GENERAL DE SERVICIOS</td>
+              <td><span class="badge badge-blue">COE</span> Comunicación Empresarial</td>
+              <td class="mismatch-detected"><span class="badge badge-gray">–</span> Sin señal</td>
+              <td>Push to Talk</td>
+              <td>—</td>
+              <td class="msg-cell">"apoyo para realizar el registro de MI TELCEL EMPRESAS"</td>
+            </tr>
+            <tr>
+              <td class="empresa-cell">KARECO DERM</td>
+              <td><span class="badge badge-blue">BUI</span> Business Intelligence</td>
+              <td class="mismatch-detected"><span class="badge badge-gray">–</span> Sin señal</td>
+              <td>GEODATA</td>
+              <td>—</td>
+              <td class="msg-cell">"Solicito información para contratar una línea de empresa..."</td>
+            </tr>
+            <tr>
+              <td class="empresa-cell">Transportes SAE</td>
+              <td><span class="badge badge-blue">GVT</span> Gestión Vehicular</td>
+              <td class="mismatch-detected"><span class="badge badge-gray">–</span> Sin señal</td>
+              <td>Medición de Combustible</td>
+              <td>—</td>
+              <td class="msg-cell">"Solicito información para unidades de equipo pesado camiones"</td>
+            </tr>
+            <tr>
+              <td class="empresa-cell">Siri &amp; Glimstad LLP</td>
+              <td><span class="badge badge-blue">MOM</span> Mobile Marketing</td>
+              <td class="mismatch-detected"><span class="badge badge-red">MOM</span> MOM — SMS/RCS</td>
+              <td>Mensajería Masiva</td>
+              <td>Mensajería Masiva ✓</td>
+              <td class="msg-cell">"SMS marketing technology...immigration law firm seeking customers..."</td>
+            </tr>
+            <tr>
+              <td class="empresa-cell">RFC / Claudia Arévalo</td>
+              <td><span class="badge badge-blue">SEG</span> Seguridad</td>
+              <td class="mismatch-detected"><span class="badge badge-gray">–</span> Sin señal</td>
+              <td>Control de Dispositivos MDM</td>
+              <td>—</td>
+              <td class="msg-cell">"Beneficiaria de mi esposo Juan Manuel Esquivel Rodríguez"</td>
+            </tr>
+            <tr>
+              <td class="empresa-cell">Gisela badillo Díaz</td>
+              <td><span class="badge badge-blue">BUI</span> Business Intelligence</td>
+              <td class="mismatch-detected"><span class="badge badge-red">GVT</span> Gest. Vehicular</td>
+              <td>Autenticación Móvil</td>
+              <td>GPS Vehicular</td>
+              <td class="msg-cell">"GPS para 6 vehículos y plan de datos y equipos celulares para 6 agente de ventas"</td>
+            </tr>
+            <tr>
+              <td class="empresa-cell">Empresario / Rosarito</td>
+              <td><span class="badge badge-blue">SEG</span> Seguridad</td>
+              <td class="mismatch-detected"><span class="badge badge-red">SEG</span> SEG — Lookout ✓</td>
+              <td>Lookout</td>
+              <td>Lookout ✓</td>
+              <td class="msg-cell">"Robo de mi dispositivo móvil"</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- CHART 3: INSIGHTS -->
+  <div class="section-gap">
+    <div class="section-title">Insights y Hallazgos Clave</div>
+    <div class="chart-box">
+      <ul class="insights-list">
+        <li data-num="1">
+          <strong>Business Intelligence tiene la tasa de "Sin señal" más alta (72%)</strong>: La mayoría de los 18 leads de BUI usan mensajes genéricos como "renovar equipo", "contratar línea" o simplemente dan el nombre. Esto sugiere que los usuarios seleccionan BUI por descarte o accidentalmente, sin comprender realmente qué solución es. Se recomienda rediseñar la descripción de BUI en el formulario con ejemplos concretos de casos de uso.
+        </li>
+        <li data-num="2">
+          <strong>El 80% de leads de GVT y GFC son detectados correctamente</strong>: Estas soluciones tienen la mayor precisión del formulario. Los usuarios que las seleccionan tienden a escribir mensajes con términos claros como "GPS", "flotilla", "unidades", "localización de empleados", demostrando intención de compra genuina y alineada.
+        </li>
+        <li data-num="3">
+          <strong>Confusión frecuente entre GVT y GFC en mensajes de GPS vehicular</strong>: Al menos 3 leads seleccionaron SEG o BUI pero sus mensajes mencionan explícitamente "GPS para vehículos", "rastrear unidades" o "GPS flotilla". La detección los clasifica en GVT, revelando que estos usuarios necesitan GVT pero se perdieron en la navegación del formulario.
+        </li>
+        <li data-num="4">
+          <strong>Conectividad Telcel (COV) tiene 5 leads mal clasificados como "No coincide"</strong>: Varios mensajes de COV contienen solicitudes de "planes para operadores", "portabilidad", o "registrar línea" — servicios que no corresponden a M2M/eSIM/Internet Gestionado sino a Planes Empresariales. Indica que usuarios confunden COV con planes de telefonía básicos.
+        </li>
+        <li data-num="5">
+          <strong>104 de 321 leads reales (32%) son Planes Empresariales (fuera de scope)</strong>: Este es el grupo más numeroso. Los mensajes son inequívocos: portabilidad, cotización de líneas, equipos con plan. Representa una oportunidad para agregar un módulo de Planes Empresariales al formulario o redirigir a canal adecuado más temprano en el funnel.
+        </li>
+        <li data-num="6">
+          <strong>Seguridad (SEG) muestra alta ambigüedad de mensajes</strong>: Solo 3 de 10 leads de SEG coinciden exactamente. Mensajes como "registrar chip", "beneficiaria de esposo", o "GPS para vehículos" indican usuarios en contexto personal o vehicular que seleccionaron SEG sin alinear intención. Sugiere que el nombre "Seguridad" evoca conceptos más amplios para los usuarios.
+        </li>
+        <li data-num="7">
+          <strong>El 56% de leads de COE (Comunicación Empresarial) tienen solución correcta pero servicio diferente</strong>: Los mensajes mencionan términos genéricos como "lineas corporativas", "planes para colaboradores", "cambiar de compañía" — compatibles con COE pero sin especificar si es Control de Ventas, PTT, SekurMessenger o Formularios Verum. Esto es esperado dada la diversidad de servicios bajo este paraguas.
+        </li>
+        <li data-num="8">
+          <strong>M2M e IoT generan confusión BUI vs COV</strong>: Dos leads que buscaban explícitamente "IoT", "data pooling" o "M2M" seleccionaron BUI (Business Intelligence), cuando la solución correcta es COV - Conectividad Avanzada M2M. Recomendación: agregar keywords IoT/M2M más visibles en la descripción de COV en el formulario.
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- CHART 4: FULL LEADS TABLE -->
+  <div class="section-gap">
+    <div class="section-title">Tabla completa de leads analizados (138 leads)</div>
+    <div class="chart-box">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Empresa</th>
+              <th>Solución seleccionada</th>
+              <th>Servicio seleccionado</th>
+              <th>Mensaje (80 chars)</th>
+              <th>Resultado</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>1</td><td class="empresa-cell">GRUPO CHILUAJI</td><td>COV — Conectividad Telcel</td><td>Conectividad Avanzada M2M</td><td class="msg-cell">"Hola quiero más información para la contratación de internet,"</td><td><span class="badge badge-gray">Sin señal</span></td></tr>
+            <tr><td>2</td><td class="empresa-cell">Insertec Industrial</td><td>BUI — Business Intelligence</td><td>Indicadores móviles</td><td class="msg-cell">"deseo tener contacto con un ejecutivo ya que queremos renovar equipos"</td><td><span class="badge badge-gray">Sin señal</span></td></tr>
+            <tr><td>3</td><td class="empresa-cell">Elba Lizeth Silva Campos</td><td>GFC — Gestión Fuerza en Campo</td><td>Servicios en Campo</td><td class="msg-cell">"Quiero crear check list para entrega de servicios evitar llevar algo equivocado..."</td><td><span class="badge badge-yellow">Sol. correcta</span></td></tr>
+            <tr><td>4</td><td class="empresa-cell">Cambio de casa</td><td>COV — Conectividad Telcel</td><td>Redes Privadas de Datos</td><td class="msg-cell">"Quiero cambiar mi número con lada de chihuahua ya tengo el chip"</td><td><span class="badge badge-gray">Sin señal</span></td></tr>
+            <tr><td>5</td><td class="empresa-cell">Compusupply</td><td>COV — Conectividad Telcel</td><td>Conectividad Avanzada M2M</td><td class="msg-cell">"X"</td><td><span class="badge badge-gray">Sin señal</span></td></tr>
+            <tr><td>6</td><td class="empresa-cell">INVERSIONES CORAL</td><td>COE — Comunicación Empresarial</td><td>Control de Ventas</td><td class="msg-cell">"NECESITAMOS UN PLAN EMPRESARIAL PARA AL MENOS 12 COLABORADORES"</td><td><span class="badge badge-gray">Sin señal</span></td></tr>
+            <tr><td>7</td><td class="empresa-cell">Tj28 empr</td><td>GVT — Gestión Vehicular</td><td>Modulo de Ruteo</td><td class="msg-cell">"Deseo que alguien me de información a la brevedad, tengo más de una semana..."</td><td><span class="badge badge-gray">Sin señal</span></td></tr>
+            <tr><td>8</td><td class="empresa-cell">DIRECTRACK TOLUCA</td><td>COE — Comunicación Empresarial</td><td>Control de Ventas</td><td class="msg-cell">"Como puedo registrar mis lineas soy una persona fisica con actividad empresarial"</td><td><span class="badge badge-gray">Sin señal</span></td></tr>
+            <tr><td>9</td><td class="empresa-cell">Sertap</td><td>COV — Conectividad Telcel</td><td>Conectividad Avanzada M2M</td><td class="msg-cell">"Comunicacion contante en movimientos internet en 3 equipos al mismo tiempo..."</td><td><span class="badge badge-yellow">Sol. correcta</span></td></tr>
+            <tr><td>10</td><td class="empresa-cell">Leviatan acuaLogistica</td><td>BUI — Business Intelligence</td><td>GEODATA</td><td class="msg-cell">"Estoy buscando planes de datos para IoT tipo pool"</td><td><span class="badge badge-red">No coincide</span></td></tr>
+            <tr><td>11</td><td class="empresa-cell">izetu</td><td>Planes Empresariales</td><td>Plan Telcel Empresa</td><td class="msg-cell">—</td><td><span class="badge badge-blue">Fuera de scope</span></td></tr>
+            <tr><td>12</td><td class="empresa-cell">Trabajando de guardia</td><td>BUI — Business Intelligence</td><td>Autenticación Móvil</td><td class="msg-cell">"Línea"</td><td><span class="badge badge-gray">Sin señal</span></td></tr>
+            <tr><td>13</td><td class="empresa-cell">san pedro Benito Juárez</td><td>COV — Conectividad Telcel</td><td>Redes Privadas de Datos</td><td class="msg-cell">"hola"</td><td><span class="badge badge-gray">Sin señal</span></td></tr>
+            <tr><td>14</td><td class="empresa-cell">Actibar linea</td><td>COV — Conectividad Telcel</td><td>eSIM</td><td class="msg-cell">"Quiero activar mi línea"</td><td><span class="badge badge-gray">Sin señal</span></td></tr>
+            <tr><td>15</td><td class="empresa-cell">Cámara Nac. Comercio Mty</td><td>Planes Emp.</td><td>Plan Telcel Empresa</td><td class="msg-cell">"Buen día, necesito 3 equipos."</td><td><span class="badge badge-blue">Fuera de scope</span></td></tr>
+            <tr><td>16</td><td class="empresa-cell">luis arturo martinez chavez</td><td>BUI — Business Intelligence</td><td>Indicadores móviles</td><td class="msg-cell">"quisiera ver si puedo cambiar un numero de telefono que tengo en un flotilla"</td><td><span class="badge badge-yellow">Sol. correcta</span></td></tr>
+            <tr><td>17</td><td class="empresa-cell">Asesoría y Protección Inmobiliaria</td><td>BUI — Business Intelligence</td><td>Autenticación Móvil</td><td class="msg-cell">"Quisiera información para la contratación de lineas empresariales."</td><td><span class="badge badge-gray">Sin señal</span></td></tr>
+            <tr><td>18</td><td class="empresa-cell">Conflictos y problemas</td><td>COE — Comunicación Empresarial</td><td>Control de Ventas</td><td class="msg-cell">"Ayuda con interfón"</td><td><span class="badge badge-gray">Sin señal</span></td></tr>
+            <tr><td>19</td><td class="empresa-cell">NUMOBIZ</td><td>Planes Emp.</td><td>Plan Telcel Empresa</td><td class="msg-cell">"Me interesa contratar 2 líneas Telcel Empresa..."</td><td><span class="badge badge-blue">Fuera de scope</span></td></tr>
+            <tr><td>20</td><td class="empresa-cell">Manuel Ignacio sepulveda</td><td>COE — Comunicación Empresarial</td><td>Control de Ventas</td><td class="msg-cell">"actualmente se hacen recargas a los celulares ... necesito que se facturen..."</td><td><span class="badge badge-gray">Sin señal</span></td></tr>
+            <tr><td>21</td><td class="empresa-cell">Gema fausto</td><td>Planes Emp.</td><td>Plan Telcel Empresa</td><td class="msg-cell">"equipos para colaboradores y para uso de IA"</td><td><span class="badge badge-blue">Fuera de scope</span></td></tr>
+            <tr><td>22</td><td class="empresa-cell">MATERIALES PARA CONSTRUCCIÓN DE LA ERA</td><td>Planes Emp.</td><td>Plan Telcel Empresa</td><td class="msg-cell">"SOLICITO PLANES PARA 11 LINEAS..."</td><td><span class="badge badge-blue">Fuera de scope</span></td></tr>
+            <tr><td>23</td><td class="empresa-cell">fletes esquer</td><td>BUI — Business Intelligence</td><td>Autenticación Móvil</td><td class="msg-cell">"necesito de su apoyo para la elaboración de un complemento de pago del mes de febrero"</td><td><span class="badge badge-gray">Sin señal</span></td></tr>
+            <tr><td>24</td><td class="empresa-cell">Cuicacalli Ac.</td><td>Planes Emp.</td><td>Plan Telcel Empresa</td><td class="msg-cell">"se requiere la cotizacion de lineas con equipo incluido"</td><td><span class="badge badge-blue">Fuera de scope</span></td></tr>
+            <tr><td>25</td><td class="empresa-cell">Registro mi línea</td><td>COV — Conectividad Telcel</td><td>eSIM</td><td class="msg-cell">"Registro mi línea telefonica"</td><td><span class="badge badge-gray">Sin señal</span></td></tr>
+            <tr><td>26</td><td class="empresa-cell">Zone Print Anuncios</td><td>BUI — Business Intelligence</td><td>GEODATA</td><td class="msg-cell">""</td><td><span class="badge badge-gray">Sin señal</span></td></tr>
+            <tr><td>27</td><td class="empresa-cell">Nomadcare de México</td><td>Planes Emp.</td><td>Plan Telcel Empresa</td><td class="msg-cell">""</td><td><span class="badge badge-blue">Fuera de scope</span></td></tr>
+            <tr><td>28</td><td class="empresa-cell">Fisico</td><td>Planes Emp.</td><td>Plan Telcel Empresa</td><td class="msg-cell">""</td><td><span class="badge badge-blue">Fuera de scope</span></td></tr>
+            <tr><td>29</td><td class="empresa-cell">CONSEDE LEASING</td><td>COV — Conectividad Telcel</td><td>eSIM</td><td class="msg-cell">"YA HABIA IDO A UN CENTRO DE ATENCION Y LLEVE MIS DOCUMENTOS..."</td><td><span class="badge badge-gray">Sin señal</span></td></tr>
+            <tr><td>30</td><td class="empresa-cell">Contar numeros</td><td>SEG — Seguridad</td><td>Norton Antivirus Empresarial</td><td class="msg-cell">"Hola ayudenme a contar los numeros ya que soy contador podrian llamarme?"</td><td><span class="badge badge-gray">Sin señal</span></td></tr>
+            <tr><td>31</td><td class="empresa-cell">Colega</td><td>COV — Conectividad Telcel</td><td>Redes Privadas de Datos</td><td class="msg-cell">"Necesito saber que pasa"</td><td><span class="badge badge-gray">Sin señal</span></td></tr>
+            <tr><td>32</td><td class="empresa-cell">SEPOING S. DE R.L.</td><td>GVT — Gestión Vehicular</td><td>Video a bordo</td><td class="msg-cell">"necesito camaras y rastreo gps"</td><td><span class="badge badge-green">Coincide</span></td></tr>
+            <tr><td>33</td><td class="empresa-cell">SUPER PARTES ABASTOS</td><td>Planes Emp.</td><td>Plan Telcel Empresa</td><td class="msg-cell">""</td><td><span class="badge badge-blue">Fuera de scope</span></td></tr>
+            <tr><td>34</td><td class="empresa-cell">Sertap (dup)</td><td>COV — Conectividad Telcel</td><td>Conectividad Avanzada M2M</td><td class="msg-cell">"5664013928" (número de teléfono)</td><td><span class="badge badge-gray">Sin señal</span></td></tr>
+            <tr><td>35</td><td class="empresa-cell">Cafetería SANDO</td><td>Planes Emp.</td><td>Plan Telcel Empresa</td><td class="msg-cell">"Hola buenas tardes me interesa un plan con equipo en renta para mi empresa"</td><td><span class="badge badge-blue">Fuera de scope</span></td></tr>
+            <tr><td>36</td><td class="empresa-cell">Javier Ulises Villalobos</td><td>COE — Comunicación Empresarial</td><td>Control de Ventas</td><td class="msg-cell">""</td><td><span class="badge badge-gray">Sin señal</span></td></tr>
+            <tr><td>37</td><td class="empresa-cell">RFC (Claudia Arévalo)</td><td>SEG — Seguridad</td><td>Control de Dispositivos MDM</td><td class="msg-cell">"Beneficiaria de mi esposo Juan Manuel Esquivel Rodríguez"</td><td><span class="badge badge-gray">Sin señal</span></td></tr>
+            <tr><td>38</td><td class="empresa-cell">XSYS Flexo México</td><td>Planes Emp.</td><td>Plan Telcel Empresa</td><td class="msg-cell">"Necesito contratar 4 líneas nuevas para mi empresa ya teniendo 13 activas"</td><td><span class="badge badge-blue">Fuera de scope</span></td></tr>
+            <tr><td>39</td><td class="empresa-cell">Yamila/Lupita</td><td>GFC — Gestión Fuerza en Campo</td><td>Localización Empresarial</td><td class="msg-cell">"Ocupo todos los servicios"</td><td><span class="badge badge-yellow">Sol. correcta</span></td></tr>
+            <tr><td>40</td><td class="empresa-cell">GVS940122</td><td>Planes Emp.</td><td>Plan Telcel Ultra Empresa</td><td class="msg-cell">"Quiero CEL nuevo"</td><td><span class="badge badge-blue">Fuera de scope</span></td></tr>
+            <tr><td>41</td><td class="empresa-cell">Grupo JR Interiores</td><td>Planes Emp.</td><td>Plan Telcel Empresa</td><td class="msg-cell">"Quisiera ver algún plan empresarial para mi compañía."</td><td><span class="badge badge-blue">Fuera de scope</span></td></tr>
+            <tr><td>42</td><td class="empresa-cell">Rebel Capital México</td><td>COE — Comunicación Empresarial</td><td>Control de Ventas</td><td class="msg-cell">"Plan de renta a nombre de persona moral"</td><td><span class="badge badge-gray">Sin señal</span></td></tr>
+            <tr><td>43</td><td class="empresa-cell">VICARA CONSULTORIA</td><td>Planes Emp.</td><td>Plan Telcel Empresa</td><td class="msg-cell">"Quisiera saber si puedo contratar online o que se requiere"</td><td><span class="badge badge-blue">Fuera de scope</span></td></tr>
+            <tr><td>44</td><td class="empresa-cell">AUGD770525T67</td><td>Planes Emp.</td><td>Plan Telcel Empresa</td><td class="msg-cell">"Kiero un plan 19 linea"</td><td><span class="badge badge-blue">Fuera de scope</span></td></tr>
+            <tr><td>45</td><td class="empresa-cell">Instituto Tecnológico de Lerdo</td><td>COE — Comunicación Empresarial</td><td>Control de Ventas</td><td class="msg-cell">"Quiero conocer sus ofertas"</td><td><span class="badge badge-gray">Sin señal</span></td></tr>
+            <tr><td>46</td><td class="empresa-cell">AGROBELA AGROQUIMICOS</td><td>GVT — Gestión Vehicular</td><td>Módulo de Ruteo</td><td class="msg-cell">"sistema de GPS para un aproximado de 10 unidades"</td><td><span class="badge badge-red">No coincide</span></td></tr>
+            <tr><td>47</td><td class="empresa-cell">Grupo Coflyar</td><td>BUI — Business Intelligence</td><td>Indicadores Móviles</td><td class="msg-cell">"15 a 20 sims para instalar en camaras de seguridad...data pooling"</td><td><span class="badge badge-red">No coincide</span></td></tr>
+            <tr><td>48</td><td class="empresa-cell">Comercializadora Ebenezer</td><td>Planes Emp.</td><td>Plan Telcel Empresa</td><td class="msg-cell">"Me gustaría cotizar 5 líneas telefónicas para mi empresa..."</td><td><span class="badge badge-blue">Fuera de scope</span></td></tr>
+            <tr><td>49</td><td class="empresa-cell">Soltero / Adan Cordova</td><td>Planes Emp.</td><td>Plan Telcel Ultra Empresa</td><td class="msg-cell">"Me gusta trabajar por mi propia cuenta"</td><td><span class="badge badge-blue">Fuera de scope</span></td></tr>
+            <tr><td>50</td><td class="empresa-cell">ANGEL JAIR RUIZ MENDOZA</td><td>COV — Conectividad Telcel</td><td>Internet Gestionado</td><td class="msg-cell">"Necesito sims y planes de datos para equipos gps, dvrs y tablets"</td><td><span class="badge badge-yellow">Sol. correcta</span></td></tr>
+            <tr><td>51</td><td class="empresa-cell">TASC LAW SC</td><td>Planes Emp.</td><td>Plan Telcel Empresa</td><td class="msg-cell">"Estoy interesada en el Telcel Empresa 1"</td><td><span class="badge badge-blue">Fuera de scope</span></td></tr>
+            <tr><td>52</td><td class="empresa-cell">Servicios y Suministros carva</td><td>Planes Emp.</td><td>Plan Telcel Empresa</td><td class="msg-cell">"Me interesa con plan y equipos"</td><td><span class="badge badge-blue">Fuera de scope</span></td></tr>
+            <tr><td>53</td><td class="empresa-cell">Operador de maquinaria</td><td>Planes Emp.</td><td>Plan Telcel Empresa</td><td class="msg-cell">"Me urge tener internet para poder comunicarme con mis trabajadores"</td><td><span class="badge badge-blue">Fuera de scope</span></td></tr>
+            <tr><td>54</td><td class="empresa-cell">Para mantenerme comunicado</td><td>Planes Emp.</td><td>Plan Telcel Empresa</td><td class="msg-cell">"Solo ocupo un teléfono que pueda ser con Plan..."</td><td><span class="badge badge-blue">Fuera de scope</span></td></tr>
+            <tr><td>55</td><td class="empresa-cell">TRANSPORTES AGSA</td><td>GVT — Gestión Vehicular</td><td>Módulo de Ruteo</td><td class="msg-cell">"FAVOR DE MANDAR WHATS ANTES, PORQUE NO TENGO ABIERTO..."</td><td><span class="badge badge-gray">Sin señal</span></td></tr>
+            <tr><td>56</td><td class="empresa-cell">HMM1508216C9</td><td>COV — Conectividad Telcel</td><td>eSIM</td><td class="msg-cell">"Actualmente tenemos lineas contratadas con Telcel...soporte de ejecutivo directo"</td><td><span class="badge badge-gray">Sin señal</span></td></tr>
+            <tr><td>57</td><td class="empresa-cell">NEWCITY HOSPITAL</td><td>COV — Conectividad Telcel</td><td>eSIM</td><td class="msg-cell">"OCUPO ACTIVAR UNA LINEA TELEFONICA, MARCA ERROR..."</td><td><span class="badge badge-gray">Sin señal</span></td></tr>
+            <tr><td>58</td><td class="empresa-cell">INJEMEX PLASTICOS</td><td>Planes Emp.</td><td>Plan Telcel Empresa</td><td class="msg-cell">"Quisiero solicitar cotización de internet móvil para la empresa..."</td><td><span class="badge badge-blue">Fuera de scope</span></td></tr>
+            <tr><td>59</td><td class="empresa-cell">TRANSPORTE JUAREZ FRONTERIZO</td><td>SEG — Seguridad</td><td>Control Móvil Empresarial</td><td class="msg-cell">"compre un nuevo chip para un empleado...registrarlo como numero empresarial"</td><td><span class="badge badge-yellow">Sol. correcta</span></td></tr>
+            <tr><td>60</td><td class="empresa-cell">PROYECTOS E INGENIERIA PYCOR</td><td>Planes Emp.</td><td>Plan Telcel Ultra Empresa</td><td class="msg-cell">"Necesitamos hacer la portabilidad de 5 líneas telefónicas..."</td><td><span class="badge badge-blue">Fuera de scope</span></td></tr>
+            <tr><td>61</td><td class="empresa-cell">Sin señal (Angelica Pedraza)</td><td>BUI — Business Intelligence</td><td>Autenticación Móvil</td><td class="msg-cell">"No tenemos señal desde hace una semana"</td><td><span class="badge badge-gray">Sin señal</span></td></tr>
+            <tr><td>62</td><td class="empresa-cell">TRANSPORTES MARTTILLO</td><td>COE — Comunicación Empresarial</td><td>Control de Ventas</td><td class="msg-cell">"planes empresariales de telefonía móvil...cuenta corporativa con Telcel..."</td><td><span class="badge badge-gray">Sin señal</span></td></tr>
+            <tr><td>63</td><td class="empresa-cell">Del Bravo SL</td><td>Planes Emp.</td><td>Plan Telcel Empresa</td><td class="msg-cell">"cotizaciones de equipos. BAM para acceso a internet."</td><td><span class="badge badge-blue">Fuera de scope</span></td></tr>
+            <tr><td>64</td><td class="empresa-cell">Grupo Modula</td><td>Planes Emp.</td><td>Plan Telcel Empresa</td><td class="msg-cell">"me interesa migrar mi empresa de ATT a Telcel"</td><td><span class="badge badge-blue">Fuera de scope</span></td></tr>
+            <tr><td>65</td><td class="empresa-cell">ASF PRISMA SEGUROS</td><td>COE — Comunicación Empresarial</td><td>Control de Ventas</td><td class="msg-cell">"Estamos con AT&T pero nos queremos cambiar tenemos 10 lineas de la empresa..."</td><td><span class="badge badge-gray">Sin señal</span></td></tr>
+            <tr><td>66</td><td class="empresa-cell">Especialista terapia respiratoria SLP</td><td>Planes Emp.</td><td>Plan Telcel Ultra Empresa</td><td class="msg-cell">"Cotizar planes para empresa"</td><td><span class="badge badge-blue">Fuera de scope</span></td></tr>
+            <tr><td>67</td><td class="empresa-cell">EZ TRAVEL SA DE CV</td><td>COV — Conectividad Telcel</td><td>Redes Privadas de Datos</td><td class="msg-cell">"necesito me proporcionen la factura de mi linea telefonica asignada por la empresa"</td><td><span class="badge badge-gray">Sin señal</span></td></tr>
+            <tr><td>68</td><td class="empresa-cell">Asociación de condóminos Torre 57</td><td>COE — Comunicación Empresarial</td><td>Push to Talk</td><td class="msg-cell">"Me interesa realizar portabilidad de línea dentro de un plan telefónico"</td><td><span class="badge badge-gray">Sin señal</span></td></tr>
+            <tr><td>69</td><td class="empresa-cell">IBIL LASER MEXICO</td><td>Planes Emp.</td><td>Plan Telcel Empresa</td><td class="msg-cell">"cotización formal sobre el plan Telcel Empresa 6 con equipo celular iPhone 14"</td><td><span class="badge badge-blue">Fuera de scope</span></td></tr>
+            <tr><td>70</td><td class="empresa-cell">AGRO INNOVACION TAPATIA</td><td>Planes Emp.</td><td>Plan Telcel Empresa</td><td class="msg-cell">"BUSCO APERTURA DE DOS LINEAS CON EQUIPO"</td><td><span class="badge badge-blue">Fuera de scope</span></td></tr>
+            <tr><td>71</td><td class="empresa-cell">pcga</td><td>Planes Emp.</td><td>Plan Telcel Empresa</td><td class="msg-cell">"Buenas tardes, me interesa saber si la factura que emiten..."</td><td><span class="badge badge-blue">Fuera de scope</span></td></tr>
+            <tr><td>72</td><td class="empresa-cell">ANIMO GLOBAL BRANDS</td><td>Planes Emp.</td><td>Plan Telcel Empresa</td><td class="msg-cell">"Quiero contratar el plan Telcel Empresa 1..."</td><td><span class="badge badge-blue">Fuera de scope</span></td></tr>
+            <tr><td>73</td><td class="empresa-cell">Tractomexico GCM</td><td>Planes Emp.</td><td>Plan Telcel Empresa</td><td class="msg-cell">"Paquete de líneas Telcel para 8 empleados"</td><td><span class="badge badge-blue">Fuera de scope</span></td></tr>
+            <tr><td>74</td><td class="empresa-cell">USE THE FORCEDICKENS</td><td>Planes Emp.</td><td>Plan Telcel Empresa</td><td class="msg-cell">"Quisiera una cotización"</td><td><span class="badge badge-blue">Fuera de scope</span></td></tr>
+            <tr><td>75</td><td class="empresa-cell">Casa Jebaju</td><td>Planes Emp.</td><td>Plan Telcel Empresa</td><td class="msg-cell">"tengo interés en hacer portabilidad de mi linea a Telcel..."</td><td><span class="badge badge-blue">Fuera de scope</span></td></tr>
+            <tr><td>76</td><td class="empresa-cell">ATO080919770</td><td>Planes Emp.</td><td>Plan Telcel Empresa</td><td class="msg-cell">"SOLICITO INFORMACION PARA PODER DAR DE ALTA MI LINEA PARA EMPRESAS"</td><td><span class="badge badge-blue">Fuera de scope</span></td></tr>
+            <tr><td>77</td><td class="empresa-cell">VGO TRANSPORT</td><td>COV — Conectividad Telcel</td><td>eSIM</td><td class="msg-cell">"NECESITO UN ASESOR DE VENTAS"</td><td><span class="badge badge-gray">Sin señal</span></td></tr>
+            <tr><td>78</td><td class="empresa-cell">Grupo Day</td><td>SEG — Seguridad</td><td>Norton Antivirus Empresarial</td><td class="msg-cell">"Hola estoy interesada en cotizar Norton empresarial para 160 dispositivos"</td><td><span class="badge badge-green">Coincide</span></td></tr>
+            <tr><td>79</td><td class="empresa-cell">ISRAEL ARRIAGA BRAVO</td><td>COV — Conectividad Telcel</td><td>Conectividad Avanzada M2M</td><td class="msg-cell">"DESEO UN PLAN PARA TODOS MIS OPERADORES CON COBERTURA NACIONAL."</td><td><span class="badge badge-yellow">Sol. correcta</span></td></tr>
+            <tr><td>80</td><td class="empresa-cell">Ex situ Consulting</td><td>Planes Emp.</td><td>Plan Telcel Empresa</td><td class="msg-cell">"requiero informacion para contratar lineas telefonicas"</td><td><span class="badge badge-blue">Fuera de scope</span></td></tr>
+            <tr><td>81</td><td class="empresa-cell">Electrificaciones Magma</td><td>Planes Emp.</td><td>Plan Telcel Empresa</td><td class="msg-cell">"información para dar de alta planes con Telcel Empresas, tengo 12 equipos"</td><td><span class="badge badge-blue">Fuera de scope</span></td></tr>
+            <tr><td>82</td><td class="empresa-cell">Infralink systemsnet</td><td>COE — Comunicación Empresarial</td><td>Push to Talk</td><td class="msg-cell">"Quiero contratar 2 planes con equipo telefonico"</td><td><span class="badge badge-gray">Sin señal</span></td></tr>
+            <tr><td>83</td><td class="empresa-cell">Jose Antonio Carreon</td><td>Planes Emp.</td><td>Plan Telcel Empresa</td><td class="msg-cell">"contratacion de plan Telcel Empresas manteniendo mi número actual"</td><td><span class="badge badge-blue">Fuera de scope</span></td></tr>
+            <tr><td>84</td><td class="empresa-cell">IVE990628NM7</td><td>BUI — Business Intelligence</td><td>GEODATA</td><td class="msg-cell">"Favor de comunicarse"</td><td><span class="badge badge-gray">Sin señal</span></td></tr>
+            <tr><td>85</td><td class="empresa-cell">QMA981028QD4</td><td>COV — Conectividad Telcel</td><td>eSIM</td><td class="msg-cell">"Busco planes con equipo"</td><td><span class="badge badge-gray">Sin señal</span></td></tr>
+            <tr><td>86</td><td class="empresa-cell">Manual 375 (Chiapas)</td><td>Planes Emp.</td><td>Plan Telcel Ultra Empresa</td><td class="msg-cell">"Manual Diaz Diaz" (nombre como mensaje)</td><td><span class="badge badge-blue">Fuera de scope</span></td></tr>
+            <tr><td>87</td><td class="empresa-cell">Andrés Flores valencia</td><td>Planes Emp.</td><td>Plan Telcel Empresa</td><td class="msg-cell">"Quiero contratar 12 líneas"</td><td><span class="badge badge-blue">Fuera de scope</span></td></tr>
+            <tr><td>88</td><td class="empresa-cell">Excotaro</td><td>COV — Conectividad Telcel</td><td>eSIM</td><td class="msg-cell">"Contratamos una línea adicional y no esta vinculado a la cuenta de la empresa..."</td><td><span class="badge badge-gray">Sin señal</span></td></tr>
+            <tr><td>89</td><td class="empresa-cell">LATITUD PROMOCIONALES</td><td>SEC — Servicios Cloud</td><td>Microsoft 365</td><td class="msg-cell">"interés en convertirnos en proveedores del área de marketing..."</td><td><span class="badge badge-red">No coincide</span></td></tr>
+            <tr><td>90</td><td class="empresa-cell">Super Pollo</td><td>COV — Conectividad Telcel</td><td>eSIM</td><td class="msg-cell">"Necesito telefonía e Internet conservando el número de TELNOR"</td><td><span class="badge badge-gray">Sin señal</span></td></tr>
+            <tr><td>91</td><td class="empresa-cell">FARO SOLUCIONES EN TECNOLOGIA</td><td>BUI — Business Intelligence</td><td>Autenticación Móvil</td><td class="msg-cell">"cómo registraremos el CURP ya que como empresa, designamos varios teléfonos..."</td><td><span class="badge badge-yellow">Sol. correcta</span></td></tr>
+            <tr><td>92</td><td class="empresa-cell">GRUPO NEOKEM</td><td>Planes Emp.</td><td>Plan Telcel Empresa</td><td class="msg-cell">"NECESITO INFORMACIÓN DE PLANES Y PORTABILIDAD"</td><td><span class="badge badge-blue">Fuera de scope</span></td></tr>
+            <tr><td>93</td><td class="empresa-cell">holacasa</td><td>Planes Emp.</td><td>Plan Telcel Empresa</td><td class="msg-cell">"Servicio más barato y sin plazos forzosos"</td><td><span class="badge badge-blue">Fuera de scope</span></td></tr>
+            <tr><td>94</td><td class="empresa-cell">GERUNDIO S.C.</td><td>Planes Emp.</td><td>Plan Telcel Empresa</td><td class="msg-cell">"Hola me interesa el plan empresa 3, me pueden dar información?"</td><td><span class="badge badge-blue">Fuera de scope</span></td></tr>
+            <tr><td>95</td><td class="empresa-cell">Soluciones litográficas ersal</td><td>GVT — Gestión Vehicular</td><td>Telemetría</td><td class="msg-cell">"Qué costo tiene?"</td><td><span class="badge badge-gray">Sin señal</span></td></tr>
+            <tr><td>96</td><td class="empresa-cell">Grupo Matias Hdez</td><td>Planes Emp.</td><td>Plan Telcel Empresa</td><td class="msg-cell">"Contratar plan para mi empresa"</td><td><span class="badge badge-blue">Fuera de scope</span></td></tr>
+            <tr><td>97</td><td class="empresa-cell">SIEMSA</td><td>COE — Comunicación Empresarial</td><td>Control de Ventas</td><td class="msg-cell">"Me enviaron mensaje de que tengo el pago vencido y se acaba de pagar..."</td><td><span class="badge badge-gray">Sin señal</span></td></tr>
+            <tr><td>98</td><td class="empresa-cell">REVE CONTADORES Y ASOCIADOS</td><td>Planes Emp.</td><td>Plan Telcel Empresa</td><td class="msg-cell">"Quiero contratar un plan de empresa"</td><td><span class="badge badge-blue">Fuera de scope</span></td></tr>
+            <tr><td>99</td><td class="empresa-cell">DUPS830718CT9</td><td>Planes Emp.</td><td>Plan Telcel Empresa</td><td class="msg-cell">"Requisitos, tiempo y proceso de contratación"</td><td><span class="badge badge-blue">Fuera de scope</span></td></tr>
+            <tr><td>100</td><td class="empresa-cell">JAZM820521KR1</td><td>COE — Comunicación Empresarial</td><td>Control de Ventas</td><td class="msg-cell">"Interesado en los planes que ofrecen con equipos."</td><td><span class="badge badge-gray">Sin señal</span></td></tr>
+            <tr><td>101</td><td class="empresa-cell">FSE CONSULTORES</td><td>Planes Emp.</td><td>Plan Telcel Empresa</td><td class="msg-cell">"Me puedes proporcionar información referente a los planes con equipo incluido."</td><td><span class="badge badge-blue">Fuera de scope</span></td></tr>
+            <tr><td>102</td><td class="empresa-cell">RADIOLOGIA DEL BAJIO</td><td>Planes Emp.</td><td>Plan Telcel Empresa</td><td class="msg-cell">"Queremos cotizar plan empresa o empresa ultra, para iPhone 17 pro max..."</td><td><span class="badge badge-blue">Fuera de scope</span></td></tr>
+            <tr><td>103</td><td class="empresa-cell">Grupo despertares iap</td><td>COV — Conectividad Telcel</td><td>eSIM</td><td class="msg-cell">"Solicito información de cuatro planes con equipo incluido"</td><td><span class="badge badge-gray">Sin señal</span></td></tr>
+            <tr><td>104</td><td class="empresa-cell">Nuevo Amanecer Seg. Privada</td><td>GFC — Gestión Fuerza en Campo</td><td>Servicios en Campo</td><td class="msg-cell">"Asesoría y atención para juntar todos los dispositivos que tengo en mi poder..."</td><td><span class="badge badge-yellow">Sol. correcta</span></td></tr>
+            <tr><td>105</td><td class="empresa-cell">INDUSTRIAS KINA</td><td>Planes Emp.</td><td>Plan Telcel Empresa</td><td class="msg-cell">"Quiero cotizar dispositivos y paquetes"</td><td><span class="badge badge-blue">Fuera de scope</span></td></tr>
+            <tr><td>106</td><td class="empresa-cell">FORMULADORA BIOESTIMULANDO ANDO</td><td>COV — Conectividad Telcel</td><td>Internet Gestionado</td><td class="msg-cell">"me gustaría contratar un internet en mi empresa, en dónde puedo hacer la contratacion"</td><td><span class="badge badge-green">Coincide</span></td></tr>
+            <tr><td>107</td><td class="empresa-cell">ZAMORA GLOBAL SERVICES</td><td>Planes Emp.</td><td>Plan Telcel Empresa</td><td class="msg-cell">"Estoy interesado en el plan de empresa 1"</td><td><span class="badge badge-blue">Fuera de scope</span></td></tr>
+            <tr><td>108</td><td class="empresa-cell">Flexopress</td><td>BUI — Business Intelligence</td><td>Autenticación Móvil</td><td class="msg-cell">"actualizar los datos fiscales de las facturas de Flexopress..."</td><td><span class="badge badge-gray">Sin señal</span></td></tr>
+            <tr><td>109</td><td class="empresa-cell">International Electronics Corp</td><td>BUI — Business Intelligence</td><td>Indicadores Móviles</td><td class="msg-cell">"ya soy cliente, requiero renovar mi plan y equipo..."</td><td><span class="badge badge-gray">Sin señal</span></td></tr>
+            <tr><td>110</td><td class="empresa-cell">Maquinas Expendedoras Mey</td><td>GVT — Gestión Vehicular</td><td>Video a bordo</td><td class="msg-cell">"nos interesa cotizar el servicio de telemetría y video a bordo."</td><td><span class="badge badge-green">Coincide</span></td></tr>
+            <tr><td>111</td><td class="empresa-cell">biota corporativo ambiental</td><td>GVT — Gestión Vehicular</td><td>Hábitos de Conducción</td><td class="msg-cell">"busco ayuda para el control de mi flotilla y habitos de manejo"</td><td><span class="badge badge-green">Coincide</span></td></tr>
+            <tr><td>112</td><td class="empresa-cell">Corporativo comadisa</td><td>BUI — Business Intelligence</td><td>Autenticación Móvil</td><td class="msg-cell">"Necesito renovar mi línea y mi equipo"</td><td><span class="badge badge-gray">Sin señal</span></td></tr>
+            <tr><td>113</td><td class="empresa-cell">LARMONT INTERNACIONAL</td><td>COV — Conectividad Telcel</td><td>Redes Privadas de Datos</td><td class="msg-cell">"quiero información de servicio de internet"</td><td><span class="badge badge-yellow">Sol. correcta</span></td></tr>
+            <tr><td>114</td><td class="empresa-cell">ACUARIO EMPRESARIAL</td><td>COV — Conectividad Telcel</td><td>Internet Gestionado</td><td class="msg-cell">"Deso un modem de internet para el negocio"</td><td><span class="badge badge-yellow">Sol. correcta</span></td></tr>
+            <tr><td>115</td><td class="empresa-cell">cupv130990ok2 (Multiplica)</td><td>GFC — Gestión Fuerza en Campo</td><td>Localización Empresarial</td><td class="msg-cell">"lglabgkaño wnfonang ajfnlafhla ahg" (mensaje inválido)</td><td><span class="badge badge-gray">Sin señal</span></td></tr>
+            <tr><td>116</td><td class="empresa-cell">OPERADORA DEE</td><td>COV — Conectividad Telcel</td><td>Conectividad Avanzada M2M</td><td class="msg-cell">"isla de maquinas vending...IoT, envían reportes...tecnología m2m..."</td><td><span class="badge badge-green">Coincide</span></td></tr>
+            <tr><td>117</td><td class="empresa-cell">INNOVA IDIOMA PRACTICO</td><td>COE — Comunicación Empresarial</td><td>Control de Ventas</td><td class="msg-cell">"lineas corporativas estoy buscando con quien y como pero no me atienden"</td><td><span class="badge badge-gray">Sin señal</span></td></tr>
+            <tr><td>118</td><td class="empresa-cell">KARECO DERM</td><td>BUI — Business Intelligence</td><td>GEODATA</td><td class="msg-cell">"Solicito informacion para contratar una linea de empresa..."</td><td><span class="badge badge-red">No coincide</span></td></tr>
+            <tr><td>119</td><td class="empresa-cell">IBEROMEX LOSGISTIC</td><td>COE — Comunicación Empresarial</td><td>Control de Ventas</td><td class="msg-cell">"QUIERO DARME DE ALTA"</td><td><span class="badge badge-gray">Sin señal</span></td></tr>
+            <tr><td>120</td><td class="empresa-cell">APTO INNOVACION DIGITAL</td><td>COV — Conectividad Telcel</td><td>Internet Gestionado</td><td class="msg-cell">"Estoy buscando comprar un equipo y ponerlo en un plan empresarial."</td><td><span class="badge badge-yellow">Sol. correcta</span></td></tr>
+            <tr><td>121</td><td class="empresa-cell">Kaa (Rosarito)</td><td>GVT — Gestión Vehicular</td><td>Video a bordo</td><td class="msg-cell">"Saber el destino de los repartidores"</td><td><span class="badge badge-yellow">Sol. correcta</span></td></tr>
+            <tr><td>122</td><td class="empresa-cell">ARQUITECTOS DIR. RESP.</td><td>Planes Emp.</td><td>Plan Telcel Empresa</td><td class="msg-cell">"solicito información para contratar el plan telcel empresa 2"</td><td><span class="badge badge-blue">Fuera de scope</span></td></tr>
+            <tr><td>123</td><td class="empresa-cell">GOBJ910904GY4</td><td>COE — Comunicación Empresarial</td><td>Control de Ventas</td><td class="msg-cell">"Mi interés es solo para adquirir diversas lineas solo somos 3 personas"</td><td><span class="badge badge-gray">Sin señal</span></td></tr>
+            <tr><td>124</td><td class="empresa-cell">Psicosmart México</td><td>COV — Conectividad Telcel</td><td>eSIM</td><td class="msg-cell">"cotización para un plan básico que abarque 20 líneas telefónicas..."</td><td><span class="badge badge-gray">Sin señal</span></td></tr>
+            <tr><td>125</td><td class="empresa-cell">GHSP MEXICO</td><td>Planes Emp.</td><td>Plan Telcel Empresa</td><td class="msg-cell">"Requiero cotizar un servicio de telefonia para 43 empleados"</td><td><span class="badge badge-blue">Fuera de scope</span></td></tr>
+            <tr><td>126</td><td class="empresa-cell">sellos mecanicos de occidente</td><td>SEG — Seguridad</td><td>Control Móvil Empresarial</td><td class="msg-cell">"instalar GPS a nuestros vehículos empresariales..."</td><td><span class="badge badge-red">No coincide</span></td></tr>
+            <tr><td>127</td><td class="empresa-cell">saneadren</td><td>Planes Emp.</td><td>Plan Telcel Empresa</td><td class="msg-cell">"Quiero cotizar 5 lineas en plan para mis empleados."</td><td><span class="badge badge-blue">Fuera de scope</span></td></tr>
+            <tr><td>128</td><td class="empresa-cell">TBA880517CI9</td><td>Planes Emp.</td><td>Plan Telcel Empresa</td><td class="msg-cell">"internet para un local comercial dentro del Aeropuerto de Guanajuato"</td><td><span class="badge badge-blue">Fuera de scope</span></td></tr>
+            <tr><td>129</td><td class="empresa-cell">Inzet Abastecedora Industrial</td><td>Planes Emp.</td><td>Plan Telcel Empresa</td><td class="msg-cell">"Necesito mas informacion"</td><td><span class="badge badge-blue">Fuera de scope</span></td></tr>
+            <tr><td>130</td><td class="empresa-cell">CEG / Jesica Becerra</td><td>Planes Emp.</td><td>Plan Telcel Empresa</td><td class="msg-cell">"paquetes de renta mensual con equipo incluído. Aprox serían 8 líneas."</td><td><span class="badge badge-blue">Fuera de scope</span></td></tr>
+            <tr><td>131</td><td class="empresa-cell">Empresario / Rosarito</td><td>SEG — Seguridad</td><td>Lookout</td><td class="msg-cell">"Robo de mi dispositivo móvil"</td><td><span class="badge badge-green">Coincide</span></td></tr>
+            <tr><td>132</td><td class="empresa-cell">Telele 5G (Violeta)</td><td>Planes Emp.</td><td>Plan Telcel Empresa</td><td class="msg-cell">"Rapidez, eficacia y sabiduría."</td><td><span class="badge badge-blue">Fuera de scope</span></td></tr>
+            <tr><td>133</td><td class="empresa-cell">Internet para trabajadores</td><td>Planes Emp.</td><td>Plan Telcel Empresa</td><td class="msg-cell">"Enserio nececito el internet para mis trabajadores para que puedan laborar"</td><td><span class="badge badge-blue">Fuera de scope</span></td></tr>
+            <tr><td>134</td><td class="empresa-cell">Fichtl Real estate solutions</td><td>Planes Emp.</td><td>Plan Telcel Empresa</td><td class="msg-cell">"Informes de planes empresariales"</td><td><span class="badge badge-blue">Fuera de scope</span></td></tr>
+            <tr><td>135</td><td class="empresa-cell">Transportes SAE</td><td>GVT — Gestión Vehicular</td><td>Medición de Combustible</td><td class="msg-cell">"Solicito información para unidades de equipo pesado camiones"</td><td><span class="badge badge-gray">Sin señal</span></td></tr>
+            <tr><td>136</td><td class="empresa-cell">B4 Global Logistics</td><td>COV — Conectividad Telcel</td><td>eSIM</td><td class="msg-cell">"Estamos buscando opciones para cambiar de compania de comunicacion."</td><td><span class="badge badge-gray">Sin señal</span></td></tr>
+            <tr><td>137</td><td class="empresa-cell">TRANSPORTES FRALSE</td><td>GVT — Gestión Vehicular</td><td>Módulo de Ruteo</td><td class="msg-cell">"Estoy buscando un GPS para las unidades que tenemos, me gustaría cotizar"</td><td><span class="badge badge-red">No coincide</span></td></tr>
+            <tr><td>138</td><td class="empresa-cell">OPERADORA GENERAL DE SERVICIOS</td><td>COE — Comunicación Empresarial</td><td>Push to Talk</td><td class="msg-cell">"apoyo para realizar el registro de MI TELCEL EMPRESAS"</td><td><span class="badge badge-gray">Sin señal</span></td></tr>
+            <tr><td>139</td><td class="empresa-cell">inmobiliaria enlace cyde</td><td>COV — Conectividad Telcel</td><td>Redes Privadas de Datos</td><td class="msg-cell">"tenemos un contrato con ATT de 10 lineas...viendo opciones en costos..."</td><td><span class="badge badge-yellow">Sol. correcta</span></td></tr>
+            <tr><td>140</td><td class="empresa-cell">ASISS ADMINISTRADORES</td><td>BUI — Business Intelligence</td><td>Autenticación Móvil</td><td class="msg-cell">"estoy buscando a un ejecutivo que me pueda ayudar a dar de baja algunas lineas"</td><td><span class="badge badge-gray">Sin señal</span></td></tr>
+            <tr><td>141</td><td class="empresa-cell">HC FORWARDING</td><td>COV — Conectividad Telcel</td><td>eSIM</td><td class="msg-cell">"Estoy interesado en contratar 3 esim en el plan de 299..."</td><td><span class="badge badge-green">Coincide</span></td></tr>
+            <tr><td>142</td><td class="empresa-cell">TECNOLOGIAS MORALES ANGELINI</td><td>COV — Conectividad Telcel</td><td>Internet Gestionado</td><td class="msg-cell">"estoy interesada en que nuestras lineas telefonicas migren a una cuenta empresarial."</td><td><span class="badge badge-yellow">Sol. correcta</span></td></tr>
+            <tr><td>143</td><td class="empresa-cell">IHJ160803TH5 (Solidaridad)</td><td>COV — Conectividad Telcel</td><td>eSIM</td><td class="msg-cell">"Quiero conocer los planes con telefono incluido"</td><td><span class="badge badge-gray">Sin señal</span></td></tr>
+            <tr><td>144</td><td class="empresa-cell">GALMICHE Y ASOCIADOS</td><td>SEG — Seguridad</td><td>Control Móvil Empresarial</td><td class="msg-cell">"gestión vehicular por favor necesitamos informacion para vehículos"</td><td><span class="badge badge-red">No coincide</span></td></tr>
+            <tr><td>145</td><td class="empresa-cell">Rogelio Eloy Garza</td><td>COV — Conectividad Telcel</td><td>Conectividad Avanzada M2M</td><td class="msg-cell">"Requiero me contacten ya q quiero sims"</td><td><span class="badge badge-yellow">Sol. correcta</span></td></tr>
+            <tr><td>146</td><td class="empresa-cell">ARGAL ESTRATEGIAS GLOBALES</td><td>Planes Emp.</td><td>Plan Telcel Ultra Empresa</td><td class="msg-cell">"DESEAMOS ADQUIRIR UNA LINEA TELEFONICA PARA CUBRIR LA COMUNICACION INTERNA..."</td><td><span class="badge badge-blue">Fuera de scope</span></td></tr>
+            <tr><td>147</td><td class="empresa-cell">oruga transforma sa de cv</td><td>GVT — Gestión Vehicular</td><td>Módulo de Ruteo</td><td class="msg-cell">"hola necesito informacion"</td><td><span class="badge badge-gray">Sin señal</span></td></tr>
+            <tr><td>148</td><td class="empresa-cell">bejos eventos</td><td>COE — Comunicación Empresarial</td><td>SekurMessenger</td><td class="msg-cell">"que me llame un asesor"</td><td><span class="badge badge-gray">Sin señal</span></td></tr>
+            <tr><td>149</td><td class="empresa-cell">Macropay</td><td>COV — Conectividad Telcel</td><td>Redes Privadas de Datos</td><td class="msg-cell">"Ya pague mi teléfono y no se desbloqueo"</td><td><span class="badge badge-gray">Sin señal</span></td></tr>
+            <tr><td>150</td><td class="empresa-cell">COMPAÑIA INDUSTRIAL TECOLOTLAN</td><td>GFC — Gestión Fuerza en Campo</td><td>Localización Empresarial</td><td class="msg-cell">"NECESITO INFORMES DE COMO CONTRATAR EL SERVICIO DE LOCALIZACIÓN EMPRESARIAL..."</td><td><span class="badge badge-green">Coincide</span></td></tr>
+            <tr><td>151</td><td class="empresa-cell">Protección y Limpieza Sentinel</td><td>Planes Emp.</td><td>Plan Telcel Empresa</td><td class="msg-cell">"quisiera obtener más informes para la contratación de planes mensuales..."</td><td><span class="badge badge-blue">Fuera de scope</span></td></tr>
+            <tr><td>152</td><td class="empresa-cell">Cbj (Luz y sonido)</td><td>Planes Emp.</td><td>Plan Telcel Empresa</td><td class="msg-cell">"Luz y sonido músic mágic electro tenemos varios paquetes para complacerte..."</td><td><span class="badge badge-blue">Fuera de scope</span></td></tr>
+            <tr><td>153</td><td class="empresa-cell">Atención al cliente / Laila</td><td>Planes Emp.</td><td>Plan Telcel Empresa</td><td class="msg-cell">"Tener mejor comunicación y atención al cliente"</td><td><span class="badge badge-blue">Fuera de scope</span></td></tr>
+            <tr><td>154</td><td class="empresa-cell">Gisela badillo Díaz</td><td>BUI — Business Intelligence</td><td>Autenticación Móvil</td><td class="msg-cell">"GPS para 6 vehículos y plan de datos y equipos celulares para 6 agente de ventas"</td><td><span class="badge badge-red">No coincide</span></td></tr>
+            <tr><td>155</td><td class="empresa-cell">Siri &amp; Glimstad LLP</td><td>MOM — Mobile Marketing</td><td>Mensajería Masiva</td><td class="msg-cell">"seeking customers through SMS marketing technology..."</td><td><span class="badge badge-green">Coincide</span></td></tr>
+            <tr><td>156</td><td class="empresa-cell">VALANZ LEGAL</td><td>Planes Emp.</td><td>Plan Telcel Empresa</td><td class="msg-cell">"Deseamos obtener una línea de telefonía celular para una nueva área del despacho..."</td><td><span class="badge badge-blue">Fuera de scope</span></td></tr>
+            <tr><td>157</td><td class="empresa-cell">LUGARE MEXICO</td><td>Planes Emp.</td><td>Plan Telcel Ultra Empresa</td><td class="msg-cell">"Me gustaría contratar un plan empresarial con Telcel para mi negocio..."</td><td><span class="badge badge-blue">Fuera de scope</span></td></tr>
+            <tr><td>158</td><td class="empresa-cell">56390 (Noe Mendoza)</td><td>COV — Conectividad Telcel</td><td>Internet Gestionado</td><td class="msg-cell">"me gustaria contratar 25 hasta 50 lineas telefonicas para utilizar el servicio de datos"</td><td><span class="badge badge-yellow">Sol. correcta</span></td></tr>
+            <tr><td>159</td><td class="empresa-cell">Se bloqueó mi chip (Jetzy)</td><td>SEG — Seguridad</td><td>Control de Dispositivos MDM</td><td class="msg-cell">"Se bloqueó mi SM"</td><td><span class="badge badge-yellow">Sol. correcta</span></td></tr>
+            <tr><td>160</td><td class="empresa-cell">Urgente (Edgar Baez)</td><td>Planes Emp.</td><td>Plan Telcel Empresa</td><td class="msg-cell">"Para poder mejorar la red en la empresa y sea eficaz"</td><td><span class="badge badge-blue">Fuera de scope</span></td></tr>
+            <tr><td>161</td><td class="empresa-cell">MOS INTERNATIONAL FOOD SERVICE</td><td>GVT — Gestión Vehicular</td><td>Módulo de Ruteo</td><td class="msg-cell">"Solicito asesoría y cotización para GPS y video en flotillas..."</td><td><span class="badge badge-yellow">Sol. correcta</span></td></tr>
+            <tr><td>162</td><td class="empresa-cell">Ejército de Salvación</td><td>Planes Emp.</td><td>Plan Telcel Empresa</td><td class="msg-cell">"queremos realizar una cotización...finalizó nuestro contrato...portabilidad"</td><td><span class="badge badge-blue">Fuera de scope</span></td></tr>
+            <tr><td>163</td><td class="empresa-cell">DIAGRAPH</td><td>BUI — Business Intelligence</td><td>Indicadores Móviles</td><td class="msg-cell">"Buen día Favor de Contactarme"</td><td><span class="badge badge-gray">Sin señal</span></td></tr>
+            <tr><td>164</td><td class="empresa-cell">Barberia (Rubi Guillen)</td><td>COV — Conectividad Telcel</td><td>Internet Gestionado</td><td class="msg-cell">"Necesito cotización para internet."</td><td><span class="badge badge-yellow">Sol. correcta</span></td></tr>
+            <tr><td>165</td><td class="empresa-cell">ARJESSIGER DE MEXICO</td><td>Planes Emp.</td><td>Plan Telcel Empresa</td><td class="msg-cell">"nos gustaría saber los requisitos para contratar un paquete empresarial"</td><td><span class="badge badge-blue">Fuera de scope</span></td></tr>
+            <tr><td>166</td><td class="empresa-cell">GB Industrial Supply</td><td>COV — Conectividad Telcel</td><td>eSIM</td><td class="msg-cell">"Como registro un linea que adquiri (chip)"</td><td><span class="badge badge-gray">Sin señal</span></td></tr>
+            <tr><td>167</td><td class="empresa-cell">hugo guzman martinez</td><td>COV — Conectividad Telcel</td><td>Redes Privadas de Datos</td><td class="msg-cell">"buenos dias quermos registrar las lines que manejamos son 2"</td><td><span class="badge badge-gray">Sin señal</span></td></tr>
+            <tr><td>168</td><td class="empresa-cell">VAPE841101P64</td><td>COV — Conectividad Telcel</td><td>Redes Privadas de Datos</td><td class="msg-cell">"Quiero contratar un plan prepago telcel empresarial"</td><td><span class="badge badge-yellow">Sol. correcta</span></td></tr>
+            <tr><td>169</td><td class="empresa-cell">PELICULAS Y LAMINADOS</td><td>GVT — Gestión Vehicular</td><td>Módulo de Ruteo</td><td class="msg-cell">"Quiero conocer costos por el servicio y saber como funciona"</td><td><span class="badge badge-gray">Sin señal</span></td></tr>
+            <tr><td>170</td><td class="empresa-cell">VIAJES MARNIC</td><td>COE — Comunicación Empresarial</td><td>Control de Ventas</td><td class="msg-cell">"Quisiera mas información de los planes empresariales que manejan con equipos"</td><td><span class="badge badge-gray">Sin señal</span></td></tr>
+            <tr><td>171</td><td class="empresa-cell">PLATINUM CARGO LOGISTICS</td><td>BUI — Business Intelligence</td><td>Autenticación Móvil</td><td class="msg-cell">"cotizacion para el plan 2 Controlado ($329) para 5 equipos iPhone 14..."</td><td><span class="badge badge-gray">Sin señal</span></td></tr>
+            <tr><td>172</td><td class="empresa-cell">CIT1804204CA</td><td>COV — Conectividad Telcel</td><td>Internet Gestionado</td><td class="msg-cell">"adquirir paquetes topados para nuestras líneas, así como equipos para el personal"</td><td><span class="badge badge-yellow">Sol. correcta</span></td></tr>
+            <tr><td>173</td><td class="empresa-cell">ROGC901129J33</td><td>COV — Conectividad Telcel</td><td>Internet Gestionado</td><td class="msg-cell">"solución para hacer failover...M2M...algo en prepago"</td><td><span class="badge badge-yellow">Sol. correcta</span></td></tr>
+            <tr><td>174</td><td class="empresa-cell">KINOTEK DISEÑO Y MONTAJE</td><td>COE — Comunicación Empresarial</td><td>Control de Ventas</td><td class="msg-cell">"solicitar información sobre sus planes Telcel para empresas..."</td><td><span class="badge badge-gray">Sin señal</span></td></tr>
+            <tr><td>175</td><td class="empresa-cell">Be Insumo para Talleres</td><td>MOM — Mobile Marketing</td><td>Internet Patrocinado</td><td class="msg-cell">"información sobre los equipos disponibles y los planes empresariales..."</td><td><span class="badge badge-gray">Sin señal</span></td></tr>
+            <tr><td>176</td><td class="empresa-cell">COGB861114KQ2</td><td>COV — Conectividad Telcel</td><td>Internet Gestionado</td><td class="msg-cell">"Quero un plan para mi negocio"</td><td><span class="badge badge-yellow">Sol. correcta</span></td></tr>
+            <tr><td>177</td><td class="empresa-cell">MEDICAL DEVICE INNOVATION</td><td>Planes Emp.</td><td>Plan Telcel Empresa</td><td class="msg-cell">"NUMERO TELEFONICO PARA AREA DE VENTAS"</td><td><span class="badge badge-blue">Fuera de scope</span></td></tr>
+            <tr><td>178</td><td class="empresa-cell">GRUPO CAFETALERO SAN FRANCISCO</td><td>COE — Comunicación Empresarial</td><td>Control de Ventas</td><td class="msg-cell">"Tengo 3 meses en espera de renovar mi celular empresarial en Xalapa..."</td><td><span class="badge badge-gray">Sin señal</span></td></tr>
+            <tr><td>179</td><td class="empresa-cell">TORRES CONSTRUCCIONES</td><td>Planes Emp.</td><td>Plan Telcel Empresa</td><td class="msg-cell">"Soy persona fisica con actividad empresarial y quisiera informacion..."</td><td><span class="badge badge-blue">Fuera de scope</span></td></tr>
+            <tr><td>180</td><td class="empresa-cell">NOMITA X PLUS SC</td><td>Planes Emp.</td><td>Plan Telcel Empresa</td><td class="msg-cell">"Información y requisitos para contratar una linea para empleado de la empresa."</td><td><span class="badge badge-blue">Fuera de scope</span></td></tr>
+            <tr><td>181</td><td class="empresa-cell">Ecsus Construction</td><td>SEG — Seguridad</td><td>Control Móvil Empresarial</td><td class="msg-cell">"Me gustaría contar con equipos móviles y planes para empleados de mi empresa..."</td><td><span class="badge badge-yellow">Sol. correcta</span></td></tr>
+            <tr><td>182</td><td class="empresa-cell">IMAQUINANDO SA DE CV</td><td>BUI — Business Intelligence</td><td>Indicadores Móviles</td><td class="msg-cell">"queremos contratar el servicio de internet para un módulo de American Express..."</td><td><span class="badge badge-yellow">Sol. correcta</span></td></tr>
+            <tr><td>183</td><td class="empresa-cell">jorge luis alanis rodriguez</td><td>COE — Comunicación Empresarial</td><td>Control de Ventas</td><td class="msg-cell">"Donde me puedo comunicar, necesito saber como puedo entrar al portal."</td><td><span class="badge badge-gray">Sin señal</span></td></tr>
+            <tr><td>184</td><td class="empresa-cell">Smartsus</td><td>COV — Conectividad Telcel</td><td>Conectividad Avanzada M2M</td><td class="msg-cell">"cotizar el servicio mensual de datos M2M de unos 100 MB al mes...10 sims"</td><td><span class="badge badge-green">Coincide</span></td></tr>
+            <tr><td>185</td><td class="empresa-cell">Fit Macroplaza</td><td>MOM — Mobile Marketing</td><td>Mensajería Masiva</td><td class="msg-cell">"requiero información sobre envió masivo de mensajes vía msn"</td><td><span class="badge badge-green">Coincide</span></td></tr>
+            <tr><td>186</td><td class="empresa-cell">BAHIA SOLAR</td><td>GVT — Gestión Vehicular</td><td>Telemetría</td><td class="msg-cell">"Ya contamos con un servicio de Telemetría por su parte, pero nos gustaría adquirir mas"</td><td><span class="badge badge-green">Coincide</span></td></tr>
+            <tr><td>187</td><td class="empresa-cell">FORTIS &amp; GROWTH</td><td>Planes Emp.</td><td>Plan Telcel Empresa</td><td class="msg-cell">"Cotizar los servicios y explorar la posibilidad de adquirir un equipo de gama alta"</td><td><span class="badge badge-blue">Fuera de scope</span></td></tr>
+            <tr><td>188</td><td class="empresa-cell">Luna Tea</td><td>Planes Emp.</td><td>Plan Telcel Empresa</td><td class="msg-cell">"Me gustaría que se contactaron con nosotros para poder revisar sus planes..."</td><td><span class="badge badge-blue">Fuera de scope</span></td></tr>
+            <tr><td>189</td><td class="empresa-cell">compañía integradora del bajio</td><td>BUI — Business Intelligence</td><td>Autenticación Móvil</td><td class="msg-cell">"cual es el proceso para dar de alta las lineas telefonicas."</td><td><span class="badge badge-gray">Sin señal</span></td></tr>
+            <tr><td>190</td><td class="empresa-cell">Registro de número / Jason Zuñiga</td><td>GVT — Gestión Vehicular</td><td>Telemetría</td><td class="msg-cell">"Quiero vincular mi linea"</td><td><span class="badge badge-gray">Sin señal</span></td></tr>
+            <tr><td>191</td><td class="empresa-cell">IMPORTADORA PACIFIC COAST</td><td>Planes Emp.</td><td>Plan Telcel Empresa</td><td class="msg-cell">"información para varias lineas...queremos automatizar la carga de saldo"</td><td><span class="badge badge-blue">Fuera de scope</span></td></tr>
+            <tr><td>192</td><td class="empresa-cell">MAWA ESPECIALIDADES</td><td>GVT — Gestión Vehicular</td><td>Módulo de Ruteo</td><td class="msg-cell">"Buenas tardes requiero 6 gps para 6 unidades"</td><td><span class="badge badge-yellow">Sol. correcta</span></td></tr>
+            <tr><td>193</td><td class="empresa-cell">No me sirve bait / Luis Angel</td><td>BUI — Business Intelligence</td><td>Autenticación Móvil</td><td class="msg-cell">"Es mejor telcel"</td><td><span class="badge badge-gray">Sin señal</span></td></tr>
+            <tr><td>194</td><td class="empresa-cell">S.A telce / María victoria</td><td>GVT — Gestión Vehicular</td><td>Módulo de Ruteo</td><td class="msg-cell">"Muchas gracias por su propuesta"</td><td><span class="badge badge-gray">Sin señal</span></td></tr>
+            <tr><td>195</td><td class="empresa-cell">Rigoberto Topete</td><td>COE — Comunicación Empresarial</td><td>Control de Ventas</td><td class="msg-cell">"Cómo puedo vincular mis lineas Telcel"</td><td><span class="badge badge-gray">Sin señal</span></td></tr>
+            <tr><td>196</td><td class="empresa-cell">OOMA851113DN5</td><td>Planes Emp.</td><td>Plan Telcel Empresa</td><td class="msg-cell">"Quiere saber información"</td><td><span class="badge badge-blue">Fuera de scope</span></td></tr>
+            <tr><td>197</td><td class="empresa-cell">VERALE FRONTERA</td><td>Planes Emp.</td><td>Plan Telcel Empresa</td><td class="msg-cell">"Hola Ocupo una línea celular para empresa."</td><td><span class="badge badge-blue">Fuera de scope</span></td></tr>
+            <!-- GFC additional leads -->
+            <tr><td>198</td><td class="empresa-cell">sxccf fg (Yazmin Aguilar)</td><td>GFC — Gestión Fuerza en Campo</td><td>Control de Sucursales</td><td class="msg-cell">""</td><td><span class="badge badge-gray">Sin señal</span></td></tr>
+            <tr><td>199</td><td class="empresa-cell">Telcel (Mario Mercado)</td><td>GFC — Gestión Fuerza en Campo</td><td>Control de Sucursales</td><td class="msg-cell">"Test"</td><td><span class="badge badge-gray">Sin señal</span></td></tr>
+            <tr><td>200</td><td class="empresa-cell">Radiomovil Dipsa</td><td>GFC — Gestión Fuerza en Campo</td><td>Promotoría y Merchandising</td><td class="msg-cell">"Esto es unaprueba"</td><td><span class="badge badge-gray">Sin señal</span></td></tr>
+            <tr><td>201</td><td class="empresa-cell">Elba Lizeth Silva (GFC)</td><td>GFC — Gestión Fuerza en Campo</td><td>Servicios en Campo</td><td class="msg-cell">"Quiero crear check list para entrega de servicios..."</td><td><span class="badge badge-yellow">Sol. correcta</span></td></tr>
+            <tr><td>202</td><td class="empresa-cell">Localización Empresarial (Clara)</td><td>GFC — Gestión Fuerza en Campo</td><td>Localización Empresarial</td><td class="msg-cell">"Ocupo todos los servicios"</td><td><span class="badge badge-yellow">Sol. correcta</span></td></tr>
+            <tr><td>203</td><td class="empresa-cell">COMPAÑIA INDUSTRIAL TECOLOTLAN</td><td>GFC — Gestión Fuerza en Campo</td><td>Localización Empresarial</td><td class="msg-cell">"NECESITO INFORMES DE COMO CONTRATAR EL SERVICIO DE LOCALIZACIÓN EMPRESARIAL..."</td><td><span class="badge badge-green">Coincide</span></td></tr>
+            <!-- Additional COE lead -->
+            <tr><td>204</td><td class="empresa-cell">ASF PRISMA SEGUROS</td><td>COE — Comunicación Empresarial</td><td>Control de Ventas</td><td class="msg-cell">"Estamos con AT&T pero nos queremos cambiar tenemos 10 lineas..."</td><td><span class="badge badge-gray">Sin señal</span></td></tr>
+            <!-- Additional GVT leads -->
+            <tr><td>205</td><td class="empresa-cell">SEPOING S. DE R.L.</td><td>GVT — Gestión Vehicular</td><td>Video a bordo</td><td class="msg-cell">"necesito camaras y rastreo gps"</td><td><span class="badge badge-green">Coincide</span></td></tr>
+            <tr><td>206</td><td class="empresa-cell">MOS FOOD SERVICE</td><td>GVT — Gestión Vehicular</td><td>Módulo de Ruteo</td><td class="msg-cell">"Solicito asesoría y cotización para GPS y video en flotillas..."</td><td><span class="badge badge-yellow">Sol. correcta</span></td></tr>
+            <tr><td>207</td><td class="empresa-cell">biota corporativo</td><td>GVT — Gestión Vehicular</td><td>Hábitos de Conducción</td><td class="msg-cell">"busco ayuda para el control de mi flotilla y habitos de manejo"</td><td><span class="badge badge-green">Coincide</span></td></tr>
+            <!-- Additional SEG leads -->
+            <tr><td>208</td><td class="empresa-cell">Grupo Day</td><td>SEG — Seguridad</td><td>Norton Antivirus Empresarial</td><td class="msg-cell">"Hola estoy interesada en cotizar Norton empresarial para 160 dispositivos"</td><td><span class="badge badge-green">Coincide</span></td></tr>
+            <tr><td>209</td><td class="empresa-cell">Empresario (Lookout)</td><td>SEG — Seguridad</td><td>Lookout</td><td class="msg-cell">"Robo de mi dispositivo móvil"</td><td><span class="badge badge-green">Coincide</span></td></tr>
+            <tr><td>210</td><td class="empresa-cell">TRANSPORTE JF (Angelica)</td><td>SEG — Seguridad</td><td>Control Móvil Empresarial</td><td class="msg-cell">"compre un nuevo chip para un empleado...registrarlo como numero empresarial"</td><td><span class="badge badge-yellow">Sol. correcta</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="footer">
+  Dashboard generado el 24/03/2026 · Telcel Empresas — Análisis Inteligente de Leads · Datos de leads_diarios_24032026.csv
+</div>
+
+</body>
+</html>
