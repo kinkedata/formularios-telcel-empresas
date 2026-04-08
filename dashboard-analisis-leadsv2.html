@@ -47,14 +47,7 @@
   .card.gray   .card-val { color: var(--gray-badge); }
   .card-label { font-size: 12px; color: var(--text-mid); font-weight: 600; line-height: 1.3; }
   .card-sub   { font-size: 11px; color: var(--text-light); margin-top: 3px; }
-  /* LEGEND BELOW CARDS */
-  .legend-panel { background: var(--white); border-radius: 10px; padding: 16px 20px;
-    box-shadow: 0 1px 4px rgba(0,48,135,0.06); margin-bottom: 28px;
-    display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
-  .legend-def { display: flex; gap: 10px; align-items: flex-start; }
-  .legend-dot-lg { width: 12px; height: 12px; border-radius: 3px; margin-top: 3px; flex-shrink: 0; }
-  .legend-def-text { font-size: 12px; color: var(--text-mid); line-height: 1.4; }
-  .legend-def-text strong { color: var(--text-dark); display: block; margin-bottom: 2px; }
+  .card-desc  { font-size: 11px; color: var(--text-mid); margin-top: 8px; line-height: 1.45; border-top: 1px solid var(--gray-border); padding-top: 8px; }
   /* INSIGHTS */
   .insights-box { background: var(--white); border-radius: 10px; padding: 22px 24px;
     box-shadow: 0 1px 4px rgba(0,48,135,0.08); margin-bottom: 28px; }
@@ -161,64 +154,31 @@
         <div class="card-val">6%</div>
         <div class="card-label">Coincide exactamente</div>
         <div class="card-sub">16 leads</div>
+        <div class="card-desc">El motor de keywords detectó la misma solución <em>y</em> el mismo servicio que el usuario seleccionó. Alta confiabilidad: el mensaje describe claramente el producto que necesita.</div>
       </div>
       <div class="card yellow">
         <div class="card-val">28%</div>
         <div class="card-label">Solución correcta</div>
         <div class="card-sub">70 leads</div>
+        <div class="card-desc">La solución detectada coincide con la seleccionada, pero el servicio específico difiere. El lead llega al equipo correcto; puede requerir orientación adicional sobre el servicio ideal.</div>
       </div>
       <div class="card red">
         <div class="card-val">19%</div>
         <div class="card-label">No coincide</div>
         <div class="card-sub">48 leads</div>
+        <div class="card-desc">La solución detectada en el mensaje es distinta a la seleccionada. Puede indicar confusión en el formulario, error de selección, o que el lead realmente necesita otra solución. Requiere revisión manual antes de asignar ejecutivo.</div>
       </div>
       <div class="card gray">
         <div class="card-val">47%</div>
         <div class="card-label">Sin señal</div>
         <div class="card-sub">120 leads</div>
+        <div class="card-desc">El mensaje no contiene palabras clave reconocibles (demasiado corto, genérico o sin términos técnicos, p.ej. "necesito información" o solo un teléfono). No es posible validar la selección automáticamente; requiere lectura manual del asesor.</div>
       </div>
       <div class="card scope">
         <div class="card-val">207</div>
         <div class="card-label">Fuera de scope</div>
         <div class="card-sub">Planes Empresariales (44% del total)</div>
-      </div>
-    </div>
-    <!-- LEYENDA DE CONCEPTOS -->
-    <div class="legend-panel">
-      <div class="legend-def">
-        <div class="legend-dot-lg" style="background:var(--green)"></div>
-        <div class="legend-def-text">
-          <strong>Coincide exactamente</strong>
-          El motor de keywords detectó la misma solución <em>y</em> el mismo servicio que el usuario seleccionó en el formulario. Alta confiabilidad del lead: el mensaje describe claramente el producto que necesita.
-        </div>
-      </div>
-      <div class="legend-def">
-        <div class="legend-dot-lg" style="background:var(--yellow)"></div>
-        <div class="legend-def-text">
-          <strong>Solución correcta</strong>
-          La solución detectada coincide con la seleccionada, pero el servicio específico dentro de esa solución difiere. El lead llegará al equipo correcto, aunque puede requerir orientación adicional sobre el servicio ideal.
-        </div>
-      </div>
-      <div class="legend-def">
-        <div class="legend-dot-lg" style="background:var(--red-badge)"></div>
-        <div class="legend-def-text">
-          <strong>No coincide</strong>
-          La solución que el motor detectó en el mensaje es distinta a la que el usuario seleccionó. Puede indicar: confusión al navegar el formulario, error de selección, o que el lead realmente necesita otra solución. Requiere revisión manual antes de asignar al ejecutivo.
-        </div>
-      </div>
-      <div class="legend-def">
-        <div class="legend-dot-lg" style="background:var(--gray-badge)"></div>
-        <div class="legend-def-text">
-          <strong>Sin señal</strong>
-          El mensaje del usuario no contiene palabras clave reconocibles (mensaje muy corto, genérico o sin términos técnicos, p.ej. "necesito información" o solo un número de teléfono). No es posible validar ni refutar la selección automáticamente; requiere lectura manual del asesor.
-        </div>
-      </div>
-      <div class="legend-def">
-        <div class="legend-dot-lg" style="background:var(--blue-dark)"></div>
-        <div class="legend-def-text">
-          <strong>Fuera de scope (Planes Empresariales)</strong>
-          Leads cuya solución seleccionada es "Planes Empresariales" — planes de telefonía móvil básica. No se analizan con el motor de soluciones avanzadas ya que siguen un flujo comercial diferente.
-        </div>
+        <div class="card-desc">Leads con "Planes Empresariales" seleccionado — telefonía móvil básica. No se analizan con el motor de soluciones avanzadas ya que siguen un flujo comercial diferente.</div>
       </div>
     </div>
   </div>
@@ -228,12 +188,12 @@
     <div class="section-title">Insights y Hallazgos Clave</div>
     <div class="insights-box">
       <ul class="insights-list">
-        <li data-num="1"><strong>47% de los leads analizados no tienen señal de keywords</strong> — Los usuarios no describen su necesidad con términos técnicos reconocibles. Las soluciones más afectadas: GFC (78% sin señal), SEG (63%), BUI (58%) y COE (55%). Recomendación: agregar un campo de "necesidad específica" con opciones guiadas.</li>
-<li data-num="2"><strong>COE tiene 0 coincidencias exactas — 43% de sus leads son en realidad COV</strong> — 20 de 47 leads de "Comunicación Empresarial" fueron detectados como Conectividad. Los usuarios eligen COE pero en su mensaje piden <em>líneas telefónicas, migración de compañía o gestión de cuenta</em>. El nombre "Comunicación Empresarial" genera confusión con la gestión básica de líneas.</li>
-<li data-num="3"><strong>BUI tiene 0 coincidencias exactas y 42% de leads mal clasificados</strong> — 11/31 leads de Business Intelligence fueron detectados como COV. Los usuarios que seleccionan BUI en realidad buscan SIMs, planes de datos IoT o GPS vehicular. Los términos de BI (geodata, KYC, analítica) son demasiado técnicos para el usuario promedio del formulario.</li>
+        <li data-num="1"><strong>47% de los leads analizados no tienen señal de keywords</strong> — Los usuarios no describen su necesidad con términos técnicos reconocibles. Las soluciones más afectadas: Gestión de Fuerza en Campo (78% sin señal), Seguridad (63%), Business Intelligence (58%) y Comunicación Empresarial (55%). Recomendación: agregar un campo de "necesidad específica" con opciones guiadas.</li>
+<li data-num="2"><strong>Comunicación Empresarial tiene 0 coincidencias exactas — 43% de sus leads son en realidad Conectividad Telcel</strong> — 20 de 47 leads de Comunicación Empresarial fueron detectados como Conectividad Telcel. Los usuarios eligen Comunicación Empresarial pero en su mensaje piden <em>líneas telefónicas, migración de compañía o gestión de cuenta</em>. El nombre genera confusión con la gestión básica de líneas.</li>
+<li data-num="3"><strong>Business Intelligence tiene 0 coincidencias exactas y 42% de leads mal clasificados</strong> — 11 de 31 leads de Business Intelligence fueron detectados como Conectividad Telcel. Los usuarios que seleccionan Business Intelligence en realidad buscan SIMs, planes de datos IoT o GPS vehicular. Los términos de BI (geodata, KYC, analítica) son demasiado técnicos para el usuario promedio del formulario.</li>
 <li data-num="4"><strong>Planes Empresariales representa el 44% del volumen total</strong> — 207 de 467 leads provienen de usuarios interesados en planes básicos de telefonía móvil, fuera del alcance de soluciones avanzadas. El banner de planes captura un volumen masivo que no califica como lead de transformación digital.</li>
-<li data-num="5"><strong>COV es la solución con mejor tasa de alineación</strong> — 64% de coincidencia (11 exactas + 51 sol. correcta de 97 leads). Es también la más demandada con el 38% del total analizado. Patrón SEG→GVT (4 casos): usuarios que buscan GPS vehicular seleccionan "Seguridad" por confusión conceptual.</li>
-<li data-num="6"><strong>COE→COV y BUI→COV concentran el 65% de todos los casos divergentes</strong> — De 48 leads "No coincide", 31 siguen este patrón. Esto indica un problema sistemático de UX: esos segmentos de usuarios no encuentran la opción correcta en el formulario y eligen la más cercana por nombre.</li>
+<li data-num="5"><strong>Conectividad Telcel es la solución con mejor tasa de alineación</strong> — 64% de coincidencia (11 exactas + 51 solución correcta de 97 leads). Es también la más demandada con el 38% del total analizado. Patrón Seguridad→Gestión Vehicular Telcel (4 casos): usuarios que buscan GPS vehicular seleccionan "Seguridad" por confusión conceptual.</li>
+<li data-num="6"><strong>Comunicación Empresarial→Conectividad y Business Intelligence→Conectividad concentran el 65% de todos los casos divergentes</strong> — De 48 leads "No coincide", 31 siguen este patrón. Esto indica un problema sistemático de UX: esos segmentos de usuarios no encuentran la opción correcta en el formulario y eligen la más cercana por nombre.</li>
       </ul>
     </div>
   </div>
